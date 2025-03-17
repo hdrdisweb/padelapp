@@ -13,7 +13,8 @@ from django.utils.timezone import now
 from django.conf import settings
 from datetime import timedelta
 from .models import PartidoAbierto
-
+from .models import Notification
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -222,7 +223,100 @@ def gestionar_partido(request, partido_id):
     partido.save()
     return redirect('lista_partidos')
 
+# Notificaciones
+
+@login_required
+def get_notifications(request):
+    """Devuelve las notificaciones no leídas del usuario"""
+    notifications = request.user.notifications.filter(is_read=False).order_by('-created_at')[:5]
+    data = [
+        {
+            "id": n.id,
+            "type": n.notification_type,
+            "message": n.message,
+            "created_at": n.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for n in notifications
+    ]
+    return JsonResponse({"notifications": data, "count": notifications.count()})
+
+# Marva las notificaciones como leidas
+
+@csrf_exempt
+@login_required
+def mark_notifications_as_read(request):
+    """Marcar todas las notificaciones del usuario como leídas"""
+    if request.method == "POST":
+        request.user.notifications.filter(is_read=False).update(is_read=True)
+        return JsonResponse({"success": True})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+# cuando nos inscribimos a un partido
+@login_required
+def inscribir_a_partido(request, match_id):
+    partido = get_object_or_404(PartidoAbierto, id=match_id)
+    user = request.user
+
+    if user in partido.jugadores.all():
+        return JsonResponse({'error': 'Ya estás inscrito en este partido'}, status=400)
+
+    partido.jugadores.add(user)
+
+    # 📌 Notificación para el usuario que se inscribió
+    Notification.objects.create(
+        user=user,
+        notification_type="match",
+        message=f"Te has unido al partido en {partido.lugar} el {partido.fecha}.",
+    )
+
+    # 📌 Si el partido se completa con 4 jugadores, enviar notificación a todos
+    if partido.jugadores.count() == 4:
+        for jugador in partido.jugadores.all():
+            Notification.objects.create(
+                user=jugador,
+                notification_type="full_match",
+                message=f"El partido en {partido.lugar} el {partido.fecha} ahora está completo.",
+            )
+
+    partido.save()
+    return JsonResponse({'success': 'Te has unido al partido', 'players': partido.jugadores.count()})
 
 
+# informar a los demas que hay un cupo libre
 
+@login_required
+def gestionar_partido(request, partido_id):
+    partido = get_object_or_404(PartidoAbierto, id=partido_id)
+    user = request.user
 
+    if user in partido.jugadores.all():
+        partido.jugadores.remove(user)
+        messages.info(request, 'Has salido del partido. Ahora hay una plaza libre.')
+
+        # 📌 Notificación para el usuario que salió
+        Notification.objects.create(
+            user=user,
+            notification_type="removed",
+            message=f"Has salido del partido en {partido.lugar} el {partido.fecha}.",
+        )
+
+        # 📌 Notificación para los demás jugadores
+        for jugador in partido.jugadores.all():
+            Notification.objects.create(
+                user=jugador,
+                notification_type="match",
+                message=f"{user.username} ha salido del partido en {partido.lugar}, vuelve a haber un cupo disponible.",
+            )
+    else:
+        if partido.jugadores.count() < 4:
+            partido.jugadores.add(user)
+            messages.success(request, '¡Te has unido al partido!')
+            
+            Notification.objects.create(
+                user=user,
+                notification_type="match",
+                message=f"Te has unido al partido en {partido.lugar} el {partido.fecha}.",
+            )
+
+    partido.save()
+    return redirect('lista_partidos')

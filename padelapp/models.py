@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings  # Para usar AUTH_USER_MODEL
 from django.utils.timezone import now, timedelta
+from django.contrib.auth.models import User
 
 # Modelo de Usuario
 class User(AbstractUser):

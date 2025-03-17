@@ -22,32 +22,18 @@
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
             <li class="nav-item dropdown"> 
-                <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown"> 
-                    <i class="bi bi-bell"></i> <span class="badge bg-primary badge-number">4</span> 
+                <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown" id="notificationBell"> 
+                    <i class="bi bi-bell"></i> 
+                    <span class="badge bg-primary badge-number" id="notificationCount">0</span> 
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications"> 
+                
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" id="notificationList">
                     <li class="dropdown-header"> 
-                        Tienes notificaciones nuevas<a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
-                    </li> 
-                    <li><hr class="dropdown-divider"></li> 
-                    <li class="notification-item"> <i class="bi bi-exclamation-circle text-warning"></i> 
-                        <div><h4>Lorem Ipsum</h4><p>Quae dolorem earum veritatis oditseno</p><p>30 min. ago</p></div> 
-                    </li> 
-                    <li><hr class="dropdown-divider"></li> 
-                    <li class="notification-item"> <i class="bi bi-x-circle text-danger"></i> 
-                        <div><h4>Atque rerum nesciunt</h4><p>Quae dolorem earum veritatis oditseno</p><p>1 hr. ago</p></div> 
-                    </li> 
-                    <li><hr class="dropdown-divider"></li> 
-                    <li class="notification-item"> <i class="bi bi-check-circle text-success"></i> 
-                        <div><h4>Sit rerum fuga</h4><p>Quae dolorem earum veritatis oditseno</p><p>2 hrs. ago</p></div> 
-                    </li> 
-                    <li><hr class="dropdown-divider"></li> 
-                    <li class="notification-item"> <i class="bi bi-info-circle text-primary"></i> 
-                        <div><h4>Dicta reprehenderit</h4><p>Quae dolorem earum veritatis oditseno</p><p>4 hrs. ago</p></div> 
-                    </li> 
-                    <li><hr class="dropdown-divider"></li> 
-                    <li class="dropdown-footer"> <a href="#">Todas las notificaciones</a> </li> 
+                        Tienes <span id="notificationTotal">0</span> notificaciones nuevas
+                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
+                    </li>
                 </ul>
+                
             </li>
             <li class="nav-item dropdown pe-3">
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
@@ -69,3 +55,68 @@
         </ul>
     </nav>
 </header>
+<script>
+    function loadNotifications() {
+        fetch('/notifications/')
+            .then(response => response.json())
+            .then(data => {
+                let notificationList = document.getElementById("notificationList");
+                let notificationCount = document.getElementById("notificationCount");
+                let notificationTotal = document.getElementById("notificationTotal");
+
+                // Vaciar la lista de notificaciones
+                notificationList.innerHTML = `
+                    <li class="dropdown-header"> 
+                        Tienes <span id="notificationTotal">${data.count}</span> notificaciones nuevas
+                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
+                    </li>`;
+
+                // Si no hay notificaciones, mostrar un mensaje
+                if (data.count === 0) {
+                    notificationList.innerHTML += `
+                        <li class="notification-item text-center">
+                            <p class="text-muted">No hay notificaciones nuevas</p>
+                        </li>`;
+                } else {
+                    // Agregar las notificaciones dinámicamente
+                    data.notifications.forEach(n => {
+                        let iconClass = "bi-info-circle text-primary";
+                        if (n.type === "match") iconClass = "bi-check-circle text-success";
+                        if (n.type === "full_match") iconClass = "bi-x-circle text-danger";
+                        if (n.type === "removed") iconClass = "bi-exclamation-circle text-warning";
+                        if (n.type === "message") iconClass = "bi-chat-dots text-secondary";
+
+                        let item = `
+                            <li class="notification-item">
+                                <i class="bi ${iconClass}"></i>
+                                <div>
+                                    <h4>${n.type.replace('_', ' ').toUpperCase()}</h4>
+                                    <p>${n.message}</p>
+                                    <p>${n.created_at}</p>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>`;
+                        notificationList.innerHTML += item;
+                    });
+                }
+
+                // Actualizar el contador de notificaciones
+                notificationCount.innerText = data.count;
+            })
+            .catch(error => console.error("Error cargando notificaciones:", error));
+    }
+    document.getElementById("notificationBell").addEventListener("click", function () {
+        fetch('/notifications/read/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } })
+            .then(() => loadNotifications());
+    });
+    
+    // Función para obtener el token CSRF
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        loadNotifications();
+        setInterval(loadNotifications, 30000); // Cargar cada 30 segundos
+    });
+</script>
