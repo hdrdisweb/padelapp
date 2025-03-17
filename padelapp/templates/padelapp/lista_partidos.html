@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2 class="mb-4">Partidos Sueltos</h2>
+    <a href="{% url 'crear_partido' %}" class="btn btn-success mb-3">+ Crear Nuevo Partido</a>
+    
+    <div class="container">
+        <div class="row">
+            {% for partido in partidos %}
+                <div class="col-md-3 mb-4">  <!-- Hace que haya 3 partidos por fila en pantallas medianas -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Partido en {{ partido.lugar }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Fecha:</strong> {{ partido.fecha }}</p>
+                            <p><strong>Hora:</strong> {{ partido.hora }}</p>
+                            <p><strong>Creador:</strong> {{ partido.creador.username }}</p>
+                            <p><strong>Jugadores ({{ partido.jugadores.count }}/4):</strong></p>
+                            <ul>
+                                {% for jugador in partido.jugadores.all %}
+                                    <li>{{ jugador.username }}</li>
+                                {% empty %}
+                                    <li>Aún no hay jugadores inscritos.</li>
+                                {% endfor %}
+                            </ul>
+                            <p><strong>Estado:</strong> 
+                                <span class="badge bg-{% if partido.estado == 'Cerrado' %}danger{% else %}success{% endif %}">
+                                    {{ partido.estado }}
+                                </span>
+                            </p>
+
+                            {% if user in partido.jugadores.all %}
+                                <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-danger btn-sm w-100">Salir del partido</a>
+                            {% elif partido.estado == 'Abierto' %}
+                                <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-primary btn-sm w-100">Unirse al partido</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

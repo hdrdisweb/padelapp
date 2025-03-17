@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Estado de la Pull: {{ pull.nombre }}</h2>
+    <p><strong>Fecha:</strong> {{ pull.fecha }}</p>
+    <p><strong>Hora:</strong> {{ pull.hora }}</p>
+
+    <h3 class="mt-4">Titulares ({{ titulares|length }})</h3>
+<ul class="list-group">
+    {% for jugador in titulares %}
+    <li class="list-group-item">{{ forloop.counter }}. {{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">No hay titulares inscritos.</li>
+    {% endfor %}
+</ul>
+
+<h3 class="mt-4">Reservas ({{ reservas|length }})</h3>
+<ul class="list-group">
+    {% for jugador in reservas %}
+    <li class="list-group-item">{{ forloop.counter }}. {{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">No hay reservas inscritos.</li>
+    {% endfor %}
+</ul>
+
+<h3 class="mt-4">No puedo asistir ({{ no_asisten|length }})</h3>
+<ul class="list-group">
+    {% for jugador in no_asisten %}
+    <li class="list-group-item">{{ forloop.counter }}. {{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">Nadie ha dicho que no puede asistir.</li>
+    {% endfor %}
+</ul>
+
+
+    <a href="{% url 'lista_pulls' %}" class="btn btn-secondary mt-4">Volver a la lista</a>
+</div>
+{% endblock %}

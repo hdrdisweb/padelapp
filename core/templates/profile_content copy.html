@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+<section class="section profile"> 
+    <div class="row"> 
+        <div class="col-xl-4"> 
+            <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                    <!-- Comprobamos si el usuario tiene avatar -->
+                    {% if user.avatar and user.avatar.url %}
+    <img src="{{ user.avatar.url }}" 
+         onerror="this.onerror=null;this.src='/static/img/default-avatar.jpg';" 
+         alt="Profile" class="rounded-circle">
+{% else %}
+    <img src="{% static 'img/default-avatar.jpg' %}" 
+         alt="Profile" class="rounded-circle">
+{% endif %}
+
+                    <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                    <h3>{{ user.username }}</h3>
+                </div>
+            </div>
+        </div>         
+        <div class="col-xl-8"> 
+            <div class="card"> 
+                <div class="card-body pt-3"> 
+                    <!-- Bordered Tabs -->                     
+                    <ul class="nav nav-tabs nav-tabs-bordered"> 
+                        <li class="nav-item"> 
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Descripción general</button>                             
+                        </li>                         
+                        <li class="nav-item"> 
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar perfil</button>                             
+                        </li>                         
+                        <li class="nav-item"> 
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Ajustes</button>                             
+                        </li>                         
+                        <li class="nav-item"> 
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Cambiar la contraseña</button>                             
+                        </li>                         
+                    </ul>                     
+                    <div class="tab-content pt-2"> 
+                        <!-- TAB 1: Información general -->
+                        <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                            <h5 class="card-title">Equipo</h5>
+                            <p class="small fst-italic">{{ user.equipo.nombre|default:"Sin equipo" }}</p>
+                            <hr style="margin-top: 20px; margin-bottom: 20px;">
+                            <span>Datos Personales</span>
+                            <div class="row mb-3" style="margin-top: 36px;">
+                                <label class="col-md-4 col-lg-3 col-form-label ">Nombre</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.first_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Apellido</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.last_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">DNI/NIE</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.dni_nie }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Fecha de Nacimiento</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="date" class="form-control" value="{{ user.fecha_nacimiento|date:'Y-m-d' }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Sexo</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.sexo }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Provincia</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.provincia }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Población</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.poblacion }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">C.P.</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.codigo_postal }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.movil }}" readonly>
+                                </div>
+                            </div>
+                            <hr style="margin-top: 20px; margin-bottom: 20px;">
+                            <span>Preferencias</span>
+                            <div class="row mb-3" style="margin-top: 36px;">
+                                <label class="col-md-4 col-lg-3 col-form-label">Posición</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.posicion_juego }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Apodo</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.apodo }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-md-4 col-lg-3 col-form-label">Marca y tipo de pala</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <input type="text" class="form-control" value="{{ user.marca_pala }}" readonly>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- TAB 2: Editar perfil COMPLETO -->
+                        <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                            <!-- Profile Edit Form -->
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row mb-3">
+                                    <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Imagen de perfil</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <!-- Verifica si el usuario tiene avatar -->
+                                        {% if user.avatar %}
+                                            <img src="{{ user.avatar.url }}" alt="Profile" class="rounded-circle">
+                                        {% else %}
+                                            <img src="{% static 'img/default-avatar.jpg' %}" alt="Profile" class="rounded-circle">
+                                        {% endif %}
+                                        
+                                        <div class="pt-2">
+                                            <input type="file" name="avatar" class="btn btn-primary btn-sm">
+                                            <a href="#" class="btn btn-danger btn-sm" title="Borrar imagen de perfil"><i class="bi bi-trash"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <hr style="margin-top: 20px; margin-bottom: 20px;">
+                                <h5 class="section-title mt-4 mb-3">Datos Personales</h5>
+                        
+                                <div class="row mb-3">
+                                    <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="first_name" type="text" class="form-control" value="{{ user.first_name }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="apellido" class="col-md-4 col-lg-3 col-form-label">Apellido</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="last_name" type="text" class="form-control" value="{{ user.last_name }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="email" type="email" class="form-control" value="{{ user.email }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="dni" class="col-md-4 col-lg-3 col-form-label">DNI/NIE</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="dni_nie" type="text" class="form-control" value="{{ user.dni_nie }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="fecha_nacimiento" class="col-md-4 col-lg-3 col-form-label">Fecha de Nacimiento</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input type="date" class="form-control" name="fecha_nacimiento" value="{{ user.fecha_nacimiento|date:'Y-m-d' }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="sexo" class="col-md-4 col-lg-3 col-form-label">Sexo</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <select id="sexo" class="form-select" name="sexo">
+                                            <option value="Hombre" {% if user.sexo == 'Hombre' %}selected{% endif %}>Hombre</option>
+                                            <option value="Mujer" {% if user.sexo == 'Mujer' %}selected{% endif %}>Mujer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="provincia" class="col-md-4 col-lg-3 col-form-label">Provincia</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="provincia" type="text" class="form-control" value="{{ user.provincia }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="poblacion" class="col-md-4 col-lg-3 col-form-label">Población</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="poblacion" type="text" class="form-control" value="{{ user.poblacion }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="cp" class="col-md-4 col-lg-3 col-form-label">C.P.</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="codigo_postal" type="text" class="form-control" value="{{ user.codigo_postal }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="telefono" class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="movil" type="text" class="form-control" value="{{ user.movil }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="apodo" class="col-md-4 col-lg-3 col-form-label">Apodo</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="apodo" type="text" class="form-control" value="{{ user.apodo }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="row mb-3">
+                                    <label for="pala" class="col-md-4 col-lg-3 col-form-label">Marca y tipo de pala</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input name="marca_pala" type="text" class="form-control" value="{{ user.marca_pala }}">
+                                    </div>
+                                </div>
+                        
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                            <!-- End Profile Edit Form -->
+                        </div>
+
+                        <!-- TAB 3 y 4 siguen intactos -->
+                    </div>
+
+                    <div class="tab-pane fade pt-3" id="profile-settings"> 
+                        <!-- Settings Form -->                             
+                        <form> 
+                            <div class="row mb-3"> 
+                                <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Notificaciones por correo electrónico</label>                                     
+                                <div class="col-md-8 col-lg-9"> 
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" type="checkbox" id="changesMade" checked> 
+                                        <label class="form-check-label" for="changesMade"> 
+                                            Cambios realizados en su cuenta
+</label>                                             
+                                    </div>                                         
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" type="checkbox" id="newProducts" checked> 
+                                        <label class="form-check-label" for="newProducts"> 
+                                            Partidos 
+</label>                                             
+                                    </div>                                         
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" type="checkbox" id="pull"> 
+                                        <label class="form-check-label" for="pull"> 
+                                            pull
+</label>                                             
+                                    </div>
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" type="checkbox" id="lapa"> 
+                                        <label class="form-check-label" for="lapa"> 
+                                            LAPA
+</label>                                             
+                                    </div>
+                                    <div class="form-check"> 
+                                        <input class="form-check-input" type="checkbox" id="snp"> 
+                                        <label class="form-check-label" for="snp"> 
+                                            SNP
+</label>                                             
+                                    </div>                                         
+                                </div>                                     
+                            </div>                                 
+                            <div class="text-center"> 
+                                <button type="submit" class="btn btn-primary">Save Changes</button>                                     
+                            </div>                                 
+                        </form>
+                        <!-- End settings Form -->                             
+                    </div>                         
+                    <div class="tab-pane fade pt-3" id="profile-change-password"> 
+                        <!-- Change Password Form -->                             
+                        <form> 
+                            <div class="row mb-3"> 
+                                <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Contraseña actual</label>                                     
+                                <div class="col-md-8 col-lg-9"> 
+                                    <input name="password" type="password" class="form-control" id="currentPassword"> 
+                                </div>                                     
+                            </div>                                 
+                            <div class="row mb-3"> 
+                                <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Nueva contraseña</label>                                     
+                                <div class="col-md-8 col-lg-9"> 
+                                    <input name="newpassword" type="password" class="form-control" id="newPassword"> 
+                                </div>                                     
+                            </div>                                 
+                            <div class="row mb-3"> 
+                                <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Repita nueva contraseña</label>                                     
+                                <div class="col-md-8 col-lg-9"> 
+                                    <input name="renewpassword" type="password" class="form-control" id="renewPassword"> 
+                                </div>                                     
+                            </div>                                 
+                            <div class="text-center"> 
+                                <button type="submit" class="btn btn-primary">Guardar contraseña</button>                                     
+                            </div>                                 
+                        </form>
+                        <!-- End Change Password Form -->                             
+                    </div>                 
+                    <!-- End Bordered Tabs -->                     
+                </div>                 
+            </div>             
+        </div>         
+    </div>     
+</section>
+
+
+{% endblock %}

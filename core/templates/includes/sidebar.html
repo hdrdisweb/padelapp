@@ -1,0 +1,35 @@
+{% load static %}
+<aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav" id="sidebar-nav">
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-grid"></i><span>Escritorio</span></a></li>
+        
+        <li class="nav-heading">Encuentros</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="{% url 'lista_partidos' %}">
+                <i class="bi bi-people"></i><span>Partidos</span>
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-toggle="collapse" href="#pull-menu" aria-expanded="false">
+                <i class="bi bi-person-lines-fill"></i><span>PULL</span> <i class="bi bi-chevron-down ms-1"></i>
+            </a>
+            <ul id="pull-menu" class="collapse">
+                <li><a class="nav-link" href="{% url 'lista_pulls' %}"><i class="bi bi-list-ul"></i> Lista de Pulls</a></li>
+                {% if request.user.is_staff %}
+    <li><a class="nav-link" href="{% url 'crear_pull' %}"> <i class="bi bi-card-checklist"></i>Crear Pull</a></li>
+{% endif %}
+
+            </ul>
+        </li>
+        
+        <li class="nav-heading">Convocatorias</li>
+        <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>LAPA</span></a></li>
+        <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>SNP</span></a></li>
+        
+        <li class="nav-heading">Varios</li>
+        <li class="nav-item"><a class="nav-link collapsed" href="/faq"><i class="bi bi-question-circle"></i><span>F.A.Q</span></a></li>
+        <li class="nav-item"><a class="nav-link collapsed" href="/contacto"><i class="bi bi-envelope"></i><span>Contacto</span></a></li>
+        <li class="nav-item"><a class="nav-link collapsed" href="/logout"><i class="bi bi-box-arrow-in-right"></i><span>Salir</span></a></li>
+    </ul>
+</aside>

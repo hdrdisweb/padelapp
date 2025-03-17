@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+
+    <div class="card p-4 shadow-lg" style="width: 350px; border-radius: 15px;">
+        <h3 class="text-center mb-4">Crear nueva cuenta</h3>
+        <p class="text-center small">Introduce tus datos personales para crear una cuenta. Una vez registrado, completa tu perfil para unirte a los partidos y equipos.</p>
+
+        <form method="POST" class="row g-3 needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="col-12">
+                <label for="yourName" class="form-label">Nombre</label>
+                <input type="text" name="name" class="form-control" id="yourName" required>
+                <div class="invalid-feedback">Por favor ingrese su nombre completo</div>
+            </div>
+
+            <div class="col-12">
+                <label for="yourEmail" class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" id="yourEmail" required>
+                <div class="invalid-feedback">Por favor ingrese su email</div>
+            </div>
+
+            <div class="col-12">
+                <label for="yourUsername" class="form-label">Usuario</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text" id="inputGroupPrepend">@</span>
+                    <input type="text" name="username" class="form-control" id="yourUsername" required>
+                    <div class="invalid-feedback">Por favor ingrese su usuario</div>
+                </div>
+            </div>
+
+            <div class="col-12 position-relative">
+                <label for="yourPassword" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" name="password" class="form-control" id="yourPassword" required>
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback">Por favor ingrese un password!</div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
+                    <label class="form-check-label" for="acceptTerms">Estoy de acuerdo y acepto los <a href="#">términos y condiciones</a></label>
+                    <div class="invalid-feedback">Debes aceptar antes de enviar.</div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button class="btn btn-primary w-100 mt-3" type="submit">Crear cuenta</button>
+            </div>
+
+            <div class="col-12 text-center mt-3">
+                <small>¿Ya tienes una cuenta? <a href="pages-login.html">Ingresa</a></small>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('yourPassword');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            togglePassword.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+        });
+    </script>
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

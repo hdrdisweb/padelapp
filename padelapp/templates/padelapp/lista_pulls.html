@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">Lista de Pulls</h2>
+        
+        {% if request.user.is_staff %}
+            <a href="{% url 'crear_pull' %}" class="btn btn-primary mb-3">+ Crear nueva Pull</a>
+        {% endif %}
+
+        <div class="row">
+            {% for pull in pulls %}
+                <div class="col-md-3 mb-4">  <!-- 4 tarjetas por fila en pantallas medianas -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">{{ pull.nombre }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Fecha:</strong> {{ pull.fecha }}</p>
+                            <p><strong>Hora:</strong> {{ pull.hora }}</p>
+                            <p><strong>Máx. Jugadores:</strong> {{ pull.max_jugadores }}</p>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if request.user.is_staff %}
+                                    <a href="{% url 'editar_pull' pull.id %}" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <a href="{% url 'eliminar_pull' pull.id %}" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'detalle_pull' pull.id %}" class="btn btn-info btn-sm w-100">
+                                    <i class="bi bi-eye"></i> Ver estado
+                                </a>
+                                <button type="button" class="btn btn-success btn-sm w-100" data-bs-toggle="modal" data-bs-target="#inscripcionModal{{ pull.id }}">
+                                    <i class="bi bi-person-check"></i> Inscribirme
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de inscripción -->
+                <div class="modal fade" id="inscripcionModal{{ pull.id }}" tabindex="-1" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="inscripcionModalLabel">Inscribirme en {{ pull.nombre }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" action="{% url 'inscribirse_pull' pull.id %}">
+                                    {% csrf_token %}
+                                    <label for="tipo">Selecciona tu posición:</label>
+                                    <select name="tipo" id="tipo" class="form-select" required>
+                                        <option value="Titular">Titular</option>
+                                        <option value="Reserva">Reserva</option>
+                                        <option value="No puedo asistir">No puedo asistir</option>
+                                    </select>
+                                    <div class="modal-footer mt-3">
+                                        <button type="submit" class="btn btn-primary">Confirmar inscripción</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No hay pulls creadas aún.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
