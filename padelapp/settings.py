@@ -101,3 +101,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = 'padelapp.User'
+
+# Definir los hosts permitidos
+ALLOWED_HOSTS = ["padelapp-jpei.onrender.com", "localhost", "127.0.0.1"]
