@@ -1,25 +1,21 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_URL = "/static/"
 
+# Si estamos en producción (Render), usamos `STATIC_ROOT`
+if os.getenv('RENDER'):
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATICFILES_DIRS = []
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # En local también necesita estar definido
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "core", "static")]
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tegrx&gr$-nm&o!5_+#p598w9c@a00(r(6^%-^xsdz*^4fiu*@'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
-
-# Application definition
-
+# Aplicaciones instaladas
 INSTALLED_APPS = [
     "grappelli",
     'django.contrib.admin',
@@ -28,12 +24,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',  # Nuestra app principal
-    'padelapp',  # mi app
+    'core',
+    'padelapp',
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir estáticos en producción
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -42,6 +40,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Configuración de rutas
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -62,72 +61,53 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'padelapp.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuración de la base de datos
+if os.getenv('RENDER'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
+# Validadores de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
+# Configuración de idioma y zona horaria
 LANGUAGE_CODE = 'es-es'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# Archivos estáticos
 STATIC_URL = "/static/"
 
-# Asegúrate de que `STATICFILES_DIRS` está bien configurado
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "core", "static"),  # Directorio donde están los archivos en desarrollo
-]
+# Configuración diferente para local y producción
+if os.getenv('RENDER'):
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATICFILES_DIRS = []  # Render solo usa STATIC_ROOT
+else:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "core", "static")]
 
-# Donde se guardarán los archivos estáticos después de `collectstatic`
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-# Whitenoise para servir archivos estáticos en producción
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
+# Configuración de la clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Modelo de usuario personalizado
 AUTH_USER_MODEL = 'padelapp.User'
-
