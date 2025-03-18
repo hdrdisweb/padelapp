@@ -6,14 +6,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = "/static/"
 
-# Si estamos en producción (Render), usamos `STATIC_ROOT`
+# Definir STATIC_ROOT para que Django pueda recopilar archivos estáticos
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Configuración para servir archivos estáticos correctamente en producción con Render
 if os.getenv('RENDER'):
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    STATICFILES_DIRS = []
+    STATICFILES_DIRS = []  # En producción, los archivos estáticos se sirven desde STATIC_ROOT
 else:
-    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # En local también necesita estar definido
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, "core", "static")]
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "core", "static")]  # En local, usamos la carpeta de estáticos
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
