@@ -63,24 +63,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'padelapp.wsgi.application'
 
 # Configuración de la base de datos
-if os.getenv('RENDER'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-        }
+# 🔹 FORZAMOS el uso de SQLite SIEMPRE
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # Validadores de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
