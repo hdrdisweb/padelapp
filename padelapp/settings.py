@@ -104,3 +104,6 @@ AUTH_USER_MODEL = 'padelapp.User'
 
 # Definir los hosts permitidos
 ALLOWED_HOSTS = ["padelapp-jpei.onrender.com", "localhost", "127.0.0.1"]
+
+
+DEBUG = os.getenv('RENDER') is None  # `True` en local, `False` en Render
