@@ -110,17 +110,19 @@ USE_TZ = True
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-# Solo usar STATICFILES_DIRS en desarrollo (opcional)
-if os.getenv('RENDER'):
-    STATICFILES_DIRS = []  # Render no usa esto
-else:
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, "core", "static")]
+# Asegúrate de que `STATICFILES_DIRS` está bien configurado
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "core", "static"),  # Directorio donde están los archivos en desarrollo
+]
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Carpeta donde se almacenan los estáticos en producción
+# Donde se guardarán los archivos estáticos después de `collectstatic`
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Whitenoise para servir archivos estáticos en producción
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
