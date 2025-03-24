@@ -30,9 +30,13 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" id="notificationList">
                     <li class="dropdown-header"> 
                         Tienes <span id="notificationTotal">0</span> notificaciones nuevas
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
+                        <a href="{% url 'lista_notificaciones' %}"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
                     </li>
+                    <div style="max-height: 300px; overflow-y: auto;" id="notificationScroll">
+                        <!-- Aquí se llenarán las notificaciones dinámicamente -->
+                    </div>
                 </ul>
+                
                 
             </li>
             <li class="nav-item dropdown pe-3">
@@ -57,66 +61,116 @@
 </header>
 <script>
     function loadNotifications() {
-        fetch('/notifications/')
+        fetch('/padel/notifications/')
             .then(response => response.json())
             .then(data => {
-                let notificationList = document.getElementById("notificationList");
+                let notificationScroll = document.getElementById("notificationScroll");
                 let notificationCount = document.getElementById("notificationCount");
                 let notificationTotal = document.getElementById("notificationTotal");
 
-                // Vaciar la lista de notificaciones
-                notificationList.innerHTML = `
-                    <li class="dropdown-header"> 
-                        Tienes <span id="notificationTotal">${data.count}</span> notificaciones nuevas
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a> 
-                    </li>`;
+                console.log("🔔 Cargando notificaciones:", data);
 
-                // Si no hay notificaciones, mostrar un mensaje
+                if (data.count > 0) {
+                    notificationCount.innerText = data.count;
+                    notificationCount.style.display = "inline";  
+                } else {
+                    notificationCount.innerText = "0";  
+                    notificationCount.style.display = "none";  
+                }
+
+                notificationTotal.innerText = data.count;
+                notificationScroll.innerHTML = "";
+
                 if (data.count === 0) {
-                    notificationList.innerHTML += `
+                    notificationScroll.innerHTML = `
                         <li class="notification-item text-center">
                             <p class="text-muted">No hay notificaciones nuevas</p>
                         </li>`;
                 } else {
-                    // Agregar las notificaciones dinámicamente
                     data.notifications.forEach(n => {
                         let iconClass = "bi-info-circle text-primary";
-                        if (n.type === "match") iconClass = "bi-check-circle text-success";
-                        if (n.type === "full_match") iconClass = "bi-x-circle text-danger";
-                        if (n.type === "removed") iconClass = "bi-exclamation-circle text-warning";
-                        if (n.type === "message") iconClass = "bi-chat-dots text-secondary";
+                        let tipoTexto = "Notificación";
+
+                        if (n.type === "pull") {
+                            iconClass = "bi-person-plus-fill text-success";
+                            tipoTexto = "Te uniste a una Pull";
+                        } else if (n.type === "full_pull") {
+                            iconClass = "bi-people-fill text-danger";
+                            tipoTexto = "Pull completa";
+                        } else if (n.type === "removed_pull") {
+                            iconClass = "bi-person-dash-fill text-warning";
+                            tipoTexto = "Saliste de una Pull";
+                        } else if (n.type === "match") {
+                            iconClass = "bi-check-circle text-success";
+                            tipoTexto = "Te uniste a un partido";
+                        } else if (n.type === "full_match") {
+                            iconClass = "bi-x-circle text-danger";
+                            tipoTexto = "Partido completo";
+                        } else if (n.type === "removed") {
+                            iconClass = "bi-exclamation-circle text-warning";
+                            tipoTexto = "Saliste de un partido";
+                        } else if (n.type === "message") {
+                            iconClass = "bi-chat-dots text-secondary";
+                            tipoTexto = "Mensaje importante";
+                        }
 
                         let item = `
                             <li class="notification-item">
                                 <i class="bi ${iconClass}"></i>
                                 <div>
-                                    <h4>${n.type.replace('_', ' ').toUpperCase()}</h4>
+                                    <h4>${tipoTexto}</h4>
                                     <p>${n.message}</p>
                                     <p>${n.created_at}</p>
                                 </div>
                             </li>
                             <li><hr class="dropdown-divider"></li>`;
-                        notificationList.innerHTML += item;
+                        notificationScroll.innerHTML += item;
                     });
                 }
-
-                // Actualizar el contador de notificaciones
-                notificationCount.innerText = data.count;
             })
-            .catch(error => console.error("Error cargando notificaciones:", error));
+            .catch(error => console.error("❌ Error cargando notificaciones:", error));
     }
+
     document.getElementById("notificationBell").addEventListener("click", function () {
-        fetch('/notifications/read/', { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } })
-            .then(() => loadNotifications());
+        fetch('/padel/notifications/read/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCSRFToken() }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("🔔 Notificaciones leídas:", data);
+            if (data.success) {
+                document.getElementById("notificationCount").innerText = "0";
+                document.getElementById("notificationCount").style.display = "none";
+                document.getElementById("notificationTotal").innerText = "0";
+    
+                // ❌ 🔹 YA NO LIMPIAMOS LAS NOTIFICACIONES DESPUÉS DE HACER CLIC
+            }
+        })
+        .catch(error => console.error("❌ Error al marcar como leídas:", error));
     });
     
-    // Función para obtener el token CSRF
+
+    // 🔹 Limpiar la lista solo cuando se haga clic en "Ver todas" o se cierre el dropdown
+    document.getElementById("notificationList").addEventListener("mouseleave", function () {
+        document.getElementById("notificationScroll").innerHTML = `
+            <li class="notification-item text-center">
+                <p class="text-muted">No hay notificaciones nuevas</p>
+            </li>`;
+    });
+
     function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
-    
+
     document.addEventListener("DOMContentLoaded", function () {
         loadNotifications();
-        setInterval(loadNotifications, 30000); // Cargar cada 30 segundos
+        setInterval(loadNotifications, 30000);
     });
 </script>
+
+
+
+
+
+

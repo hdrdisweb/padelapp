@@ -142,10 +142,12 @@ def inscribirse_pull(request, id):
 
         print(f"📌 {user.username} intenta inscribirse en la Pull {pull.nombre} como {tipo}")
 
+        # Comprobar si la Pull ya está llena para 'Titular'
         if tipo == "Titular" and Pull.objects.filter(pull_asociada=pull, tipo="Titular").count() >= pull.max_jugadores:
             messages.error(request, "La lista de titulares ya está llena. Elige otra opción.")
             return redirect("detalle_pull", pk=pull.id)
 
+        # Si el usuario ya está inscrito, actualiza su tipo en vez de bloquear
         inscripcion, created = Pull.objects.update_or_create(
             jugador=user,
             pull_asociada=pull,
@@ -156,31 +158,27 @@ def inscribirse_pull(request, id):
             messages.success(request, f"Te has inscrito como {tipo} en {pull.nombre}")
             print(f"✅ Inscripción creada: {inscripcion}")
 
-            # 📌 Crear la notificación asegurando que `is_read=False`
-            notificacion = Notification.objects.create(
+            # 📌 Notificación para el usuario inscrito
+            Notification.objects.create(
                 user=user,
                 notification_type="pull",
                 message=f"Te has inscrito en la Pull {pull.nombre} para el {pull.fecha} a las {pull.hora}.",
-                is_read=False  # 🔹 IMPORTANTE: Asegurar que no se marque como leída
             )
-            print(f"🟢 Notificación creada: {notificacion}")
 
         else:
             messages.success(request, f"Tu inscripción ha sido actualizada a {tipo}")
             print(f"♻️ Inscripción actualizada: {inscripcion}")
 
+        # 📌 Si la Pull se llena, notificar a todos los jugadores inscritos
         if Pull.objects.filter(pull_asociada=pull, tipo="Titular").count() == pull.max_jugadores:
             for jugador in Pull.objects.filter(pull_asociada=pull).values_list('jugador', flat=True):
-                notificacion_full_pull = Notification.objects.create(
+                Notification.objects.create(
                     user_id=jugador,
                     notification_type="full_pull",
                     message=f"La Pull {pull.nombre} para el {pull.fecha} a las {pull.hora} está completa.",
-                    is_read=False  # 🔹 Asegurar que no se marque como leída
                 )
-                print(f"🔴 Notificación de Pull llena creada: {notificacion_full_pull}")
 
         return redirect("lista_pulls")
-
 
 # salir pulls
 
@@ -294,24 +292,27 @@ def get_notifications(request):
 
 
 # Marva las notificaciones como leidas
-@csrf_exempt
+
+@csrf_exempt  # 🔹 Desactiva CSRF solo para pruebas
 @login_required
 def mark_notifications_as_read(request):
     """Marcar todas las notificaciones del usuario como leídas"""
     if request.method != "POST":
         return JsonResponse({"error": f"Método no permitido: {request.method}"}, status=405)
 
-    print(f"🔍 Se están marcando como leídas para {request.user.username}")
-
+    # 📌 Debug: Verificar si la solicitud llega correctamente
+    print(f"🔹 Recibido método: {request.method}")
+    
     notificaciones_no_leidas = request.user.notifications.filter(is_read=False)
-
+    
     if notificaciones_no_leidas.exists():
-        notificaciones_no_leidas.update(is_read=True)  # 🔹 Marcar como leídas solo cuando el usuario haga clic
+        notificaciones_no_leidas.update(is_read=True)  # 🔹 Marcar todas como leídas
         print(f"✅ Notificaciones marcadas como leídas para {request.user.username}")
-        return JsonResponse({"success": True, "count": 0})
+        return JsonResponse({"success": True, "count": 0})  # 🔹 Confirmar que están en 0
 
     print(f"⚠️ No había notificaciones pendientes para {request.user.username}")
-    return JsonResponse({"success": True, "count": 0})
+    return JsonResponse({"success": True, "count": 0})  # 🔹 Si ya estaban en 0, devolver 0
+
 
 
     # 📌 Notificación para el usuario que se inscribió

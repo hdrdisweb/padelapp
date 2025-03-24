@@ -5,9 +5,10 @@ from padelapp.models import Notification  # Solo importar lo necesario
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 
-
-
+def index(request):
+    return render(request, 'index.html')
 
 def user_login(request):
     """Vista para el inicio de sesión"""

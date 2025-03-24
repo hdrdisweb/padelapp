@@ -3,23 +3,24 @@ from django.urls import path, include
 from .views import user_login, dashboard, user_logout, profile
 from . import views 
 from padelapp.views import crear_partido, gestionar_partido, lista_partidos  
-
+from .views import index
 
 
 urlpatterns = [
-    path("grappelli/", include("grappelli.urls")),  # Grappelli para mejorar el admin
-    path("admin/", admin.site.urls),  # Admin de Django
-    path("", user_login, name="login"),  # Página principal -> login
+    path("grappelli/", include("grappelli.urls")),
+    path("admin/", admin.site.urls),
+    
+    path("", index, name="index"),  # 👈 Ahora el index es la raíz
+    path("login/", user_login, name="login"),  # 👈 Movemos el login a su ruta real
+    
     path('registro/', views.register, name='register'),
-    path("dashboard/", dashboard, name="dashboard"),  # Dashboard
-    path("logout/", user_logout, name="logout"),  # Cerrar sesión
-    path("profile/", profile, name="profile"),  # Añadimos la ruta para el perfil
-
-    # Incluir rutas de la app "padelapp"
+    path("dashboard/", dashboard, name="dashboard"),
+    path("logout/", user_logout, name="logout"),
+    path("profile/", profile, name="profile"),
+    
     path("padel/", include("padelapp.urls")),
-    path('partidos/', lista_partidos, name='lista_partidos'),  # 🔹 Listar partidos
-    path('partidos/crear/', crear_partido, name='crear_partido'),  # 🔹 Crear un partido
-    path('partidos/<int:partido_id>/gestionar/', gestionar_partido, name='gestionar_partido'),  # 🔹 Unirse o salir de un partido
-
-
+    path('partidos/', lista_partidos, name='lista_partidos'),
+    path('partidos/crear/', crear_partido, name='crear_partido'),
+    path('partidos/<int:partido_id>/gestionar/', gestionar_partido, name='gestionar_partido'),
 ]
+
