@@ -1,32 +1,77 @@
 {% load static %}
+
 <section class="section dashboard">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card info-card sales-card">
-                <div class="card-body">
-                    <h5 class="card-title">Partidos Programados daro <span>| Esta semana</span></h5>
-                    <div class="d-flex align-items-center">
-                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
-                        <div class="ps-3">
-                            <h6>5</h6>
-                            <span class="text-success small pt-1 fw-bold">+2</span> <span class="text-muted small pt-2 ps-1">más que la semana pasada</span>
+    <div class="container">
+        <div class="row justify-content-center gy-4">
+
+            <!-- Partidos Programados -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card info-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Partidos Programados <span class="text-muted small">| Esta semana</span></h5>
+                        <div class="d-flex justify-content-center align-items-center my-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3 bg-primary text-white" style="width: 50px; height: 50px;">
+                                <i class="bi bi-calendar-event fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">5</h6>
+                                <small class="text-success fw-bold">+2</small> <small class="text-muted">más que la semana pasada</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Estadísticas de Jugador</h5>
-                    <p>Partidos jugados: 12</p>
-                    <p>Victorias: 8</p>
-                    <p>Derrotas: 4</p>
+            <!-- Estadísticas del Jugador -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card info-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Tu Rendimiento</h5>
+                        <ul class="list-group list-group-flush text-start">
+                            <li class="list-group-item">🎾 Partidos jugados: <strong>12</strong></li>
+                            <li class="list-group-item text-success">✅ Victorias: <strong>8</strong></li>
+                            <li class="list-group-item text-danger">❌ Derrotas: <strong>4</strong></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+
+            <!-- Próximos Partidos -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card info-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Próximos Partidos</h5>
+                        <ul class="list-group list-group-flush text-start">
+                            <li class="list-group-item">📅 Miércoles 27 - 20:00 hs - Club Centro</li>
+                            <li class="list-group-item">📅 Viernes 29 - 19:30 hs - Padel Sur</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ranking del Jugador -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card info-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Tu Ranking</h5>
+                        <p class="mb-1">🏅 Posición actual: <strong>5º</strong></p>
+                        <p class="text-muted small">Último ascenso: +2 lugares esta semana</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acción Rápida -->
+            <div class="col-md-8">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">¿Listo para jugar?</h5>
+                        <a href="{% url 'crear_partido' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle me-1"></i> Crear nuevo partido
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
