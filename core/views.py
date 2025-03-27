@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
+from django.core.mail import EmailMessage
+from .forms import ContactForm
 
 def index(request):
     return render(request, 'index.html')
@@ -106,4 +108,29 @@ def profile(request):
 def crear_pull(request):
     if not request.user.is_staff:
         messages.error(request, "No estás autorizado para crear una pull.")
-        return redirect('lista_pulls')
+        return redirect('lista_pulls') 
+
+
+# pagina de contacto  
+
+def contacto_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            email = EmailMessage(
+                subject=data['subject'],
+                body=f"Mensaje de {data['name']} <{data['email']}>\n\n{data['message']}",
+                from_email=data['email'],
+                to=['tucorreo@dominio.com'],  # reemplazar con tu email real
+            )
+            try:
+                email.send()
+                messages.success(request, 'Tu mensaje ha sido enviado correctamente.')
+            except:
+                messages.error(request, 'Ocurrió un error al enviar el mensaje. Intenta más tarde.')
+            return redirect('contacto')
+    else:
+        form = ContactForm()
+
+    return render(request, 'contacto.html', {'form': form})

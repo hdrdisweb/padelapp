@@ -129,3 +129,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'padelapp.User'
 
+# correo contacto
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.tudominio.com'  # ej: smtp.ionos.es
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'tucorreo@dominio.com'
+EMAIL_HOST_PASSWORD = 'tu_contraseña'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
