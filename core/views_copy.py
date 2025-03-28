@@ -7,10 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
-from core.forms import ContactForm
-from django.conf import settings
-
-
+from .forms import ContactForm
 
 def index(request):
     return render(request, 'index.html')
@@ -115,38 +112,28 @@ def crear_pull(request):
 
 
 # pagina de contacto  
+
 def contacto_view(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-
-            body = (
-                f"Nombre: {data['name']}\n"
-                f"Correo: {data['email']}\n"
-                f"Asunto: {data['subject']}\n\n"
-                f"Mensaje:\n{data['message']}"
-            )
-
             email = EmailMessage(
                 subject=data['subject'],
-                body=body,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=['hdrdisweb@gmail.com'],
-                reply_to=[data['email']],
+                body=f"Mensaje de {data['name']} <{data['email']}>\n\n{data['message']}",
+                from_email=data['email'],
+                to=['hdrdisweb@gmail.com'],  # reemplazar con tu email real
             )
             try:
                 email.send()
                 messages.success(request, 'Tu mensaje ha sido enviado correctamente.')
-            except Exception as e:
-                print("ERROR EN ENVÍO DE EMAIL:", e)
+            except:
                 messages.error(request, 'Ocurrió un error al enviar el mensaje. Intenta más tarde.')
             return redirect('contacto')
     else:
         form = ContactForm()
 
     return render(request, 'contacto.html', {'form': form})
-
 
 # pagina de faq
 
