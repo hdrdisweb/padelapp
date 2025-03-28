@@ -122,7 +122,7 @@ def contacto_view(request):
                 subject=data['subject'],
                 body=f"Mensaje de {data['name']} <{data['email']}>\n\n{data['message']}",
                 from_email=data['email'],
-                to=['tucorreo@dominio.com'],  # reemplazar con tu email real
+                to=['hdrdisweb@gmail.com'],  # reemplazar con tu email real
             )
             try:
                 email.send()

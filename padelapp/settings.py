@@ -132,9 +132,9 @@ AUTH_USER_MODEL = 'padelapp.User'
 # correo contacto
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.tudominio.com'  # ej: smtp.ionos.es
+EMAIL_HOST = 'smtp.ionos.es'  # ej: smtp.ionos.es
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'tucorreo@dominio.com'
-EMAIL_HOST_PASSWORD = 'tu_contraseña'
+EMAIL_HOST_USER = 'info@xn--hdrdiseoweb-7db.es'
+EMAIL_HOST_PASSWORD = 'HDRdisweb@123456'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
