@@ -5,6 +5,7 @@ from . import views
 from padelapp.views import crear_partido, gestionar_partido, lista_partidos  
 from .views import index
 from .views import contacto_view 
+from .views import faq_view
 
 
 urlpatterns = [
@@ -24,5 +25,6 @@ urlpatterns = [
     path('partidos/crear/', crear_partido, name='crear_partido'),
     path('partidos/<int:partido_id>/gestionar/', gestionar_partido, name='gestionar_partido'),
     path('contacto/', contacto_view, name='contacto'),
+    path('faq/', faq_view, name='faq'),
 ]
 

@@ -134,3 +134,8 @@ def contacto_view(request):
         form = ContactForm()
 
     return render(request, 'contacto.html', {'form': form})
+
+# pagina de faq
+
+def faq_view(request):
+    return render(request, 'faq.html', {})
