@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -15,6 +16,11 @@ from datetime import timedelta
 from .models import PartidoAbierto
 from .models import Notification
 from django.views.decorators.csrf import csrf_exempt
+from .models import Alineacion, Pareja, ParejaEnPista
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+
+
 
 
 
@@ -89,17 +95,22 @@ def lista_pulls(request):
 def detalle_pull(request, id):
     pull = get_object_or_404(CrearPull, id=id)
 
-    # Ahora filtramos las inscripciones usando pull_asociada
+    # Inscripciones
     inscritos = Pull.objects.filter(pull_asociada=pull)
     titulares = inscritos.filter(tipo='Titular')
     reservas = inscritos.filter(tipo='Reserva')
     no_asisten = inscritos.filter(tipo='No puedo asistir')
 
+    # 🔗 Generar link para compartir por WhatsApp
+    pull_url = request.build_absolute_uri(reverse('detalle_pull', args=[pull.id]))
+    mensaje_whatsapp = f"¡Nueva pull creada! 🎾\n\nPull: {pull.nombre}\n🗓️ {pull.fecha} ⏰ {pull.hora}\n\n👉 Inscribite: {pull_url}"
+
     return render(request, 'padelapp/detalle_estado_pull.html', {
         'pull': pull,
         'titulares': titulares,
         'reservas': reservas,
-        'no_asisten': no_asisten
+        'no_asisten': no_asisten,
+        'mensaje_whatsapp': mensaje_whatsapp,
     })
 
 
@@ -255,6 +266,11 @@ def crear_partido(request):
 def lista_partidos(request):
     PartidoAbierto.limpiar_partidos_viejos()
     partidos = PartidoAbierto.objects.all().order_by('-fecha')
+
+    for partido in partidos:
+        url = request.build_absolute_uri(reverse('gestionar_partido', args=[partido.id]))
+        partido.mensaje_whatsapp = f"🎾 ¡Sumate al partido en {partido.lugar}!\n🗓️ {partido.fecha} ⏰ {partido.hora}\n👉 {url}"
+
     return render(request, 'padelapp/lista_partidos.html', {'partidos': partidos})
 
 # gestionar partidos
@@ -380,4 +396,69 @@ def lista_notificaciones(request):
     notifications = request.user.notifications.order_by('-created_at')
     return render(request, 'padelapp/notificaciones.html', {'notifications': notifications})
 
+# gestionar las alineaciones
 
+User = get_user_model()
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+@login_required
+def gestionar_alineacion(request, pull_id):
+    pull = get_object_or_404(CrearPull, id=pull_id)
+    inscritos = Pull.objects.filter(pull_asociada=pull, tipo='Titular').select_related('jugador')
+    jugadores = [p.jugador for p in inscritos]
+    alineacion = Alineacion.objects.filter(pull=pull).first()
+
+    if request.method == "POST":
+        data_json = request.POST.get('alineacion_data')
+        print("🔍 DATA RECIBIDA:", data_json)
+
+        if data_json:
+            data = json.loads(data_json)
+            parejas_data = data.get('parejas', [])
+            suplentes_ids = data.get('suplentes', [])
+
+            if alineacion:
+                alineacion.parejas.clear()
+                alineacion.suplentes.clear()
+                ParejaEnPista.objects.filter(alineacion=alineacion).delete()
+            else:
+                alineacion = Alineacion.objects.create(pull=pull, creada_por=request.user)
+
+            for pareja_info in parejas_data:
+                jugador1 = User.objects.get(id=pareja_info['jugador1'])
+                jugador2 = User.objects.get(id=pareja_info['jugador2'])
+                pista = int(pareja_info['pista'])
+
+                pareja = Pareja.objects.create(jugador_1=jugador1, jugador_2=jugador2)
+                ParejaEnPista.objects.create(alineacion=alineacion, pareja=pareja, pista=pista)
+
+            suplentes = User.objects.filter(id__in=suplentes_ids)
+            alineacion.suplentes.set(suplentes)
+
+            messages.success(request, "Alineación guardada correctamente.")
+            return redirect('gestionar_alineacion', pull_id=pull.id)
+
+    # Cargar parejas guardadas para mostrar en las pistas
+    parejas_en_pista = None
+    jugadores_asignados = []
+    if alineacion:
+        parejas_en_pista = ParejaEnPista.objects.filter(alineacion=alineacion).select_related('pareja')
+        for item in parejas_en_pista:
+            jugadores_asignados.append(item.pareja.jugador_1)
+            jugadores_asignados.append(item.pareja.jugador_2)
+
+    # Mostrar solo los jugadores no asignados
+    jugadores_disponibles = [j for j in jugadores if j not in jugadores_asignados]
+
+    alineacion_url = request.build_absolute_uri(reverse('gestionar_alineacion', args=[pull.id]))
+    mensaje_whatsapp = f"¡Mirá la alineación de {pull.nombre}! 👉 {alineacion_url}"
+
+
+    context = {
+        'pull': pull,
+        'jugadores': jugadores_disponibles,
+        'alineacion': alineacion,
+        'parejas_en_pista': parejas_en_pista,
+        'mensaje_whatsapp': mensaje_whatsapp,
+    }
+    return render(request, 'padelapp/gestionar_alineacion.html', context)

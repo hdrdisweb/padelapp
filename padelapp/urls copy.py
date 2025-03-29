@@ -2,7 +2,10 @@ from django.urls import path
 from .views import inscribir_a_partido, inscribir_a_pull
 from . import views
 from .views import crear_partido, gestionar_partido, lista_partidos
-from .views import get_notifications, mark_notifications_as_read
+from .views import get_notifications, mark_notifications_as_read, lista_notificaciones, salir_pull
+
+
+
 
 
 urlpatterns = [
@@ -19,6 +22,10 @@ urlpatterns = [
     path('partidos/<int:partido_id>/gestionar/', gestionar_partido, name='gestionar_partido'),
     path('notifications/', get_notifications, name='get_notifications'),
     path('notifications/read/', mark_notifications_as_read, name='mark_notifications_as_read'),
+    path("notificaciones/", lista_notificaciones, name="lista_notificaciones"),
+    path('pull/<int:id>/salir/', salir_pull, name='salir_pull'),
+
+
     
 
     

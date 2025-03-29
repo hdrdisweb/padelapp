@@ -24,6 +24,8 @@ urlpatterns = [
     path('notifications/read/', mark_notifications_as_read, name='mark_notifications_as_read'),
     path("notificaciones/", lista_notificaciones, name="lista_notificaciones"),
     path('pull/<int:id>/salir/', salir_pull, name='salir_pull'),
+    path('pull/<int:pull_id>/alineacion/', views.gestionar_alineacion, name='gestionar_alineacion'),
+
 
 
     

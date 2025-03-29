@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2 class="mb-4">Partidos Sueltos</h2>
-    <a href="{% url 'crear_partido' %}" class="btn btn-success mb-3">+ Crear Nuevo Partido</a>
+    <a href="{% url 'crear_partido' %}" class="btn btn-primary mb-3">+ Crear Nuevo Partido</a>
     
     <div class="container">
         <div class="row">
@@ -25,7 +25,7 @@
                                 {% endfor %}
                             </ul>
                             <p><strong>Estado:</strong> 
-                                <span class="badge bg-{% if partido.estado == 'Cerrado' %}danger{% else %}success{% endif %}">
+                                <span class="badge bg-{% if partido.estado == 'Cerrado' %}danger{% else %}info{% endif %}">
                                     {{ partido.estado }}
                                 </span>
                             </p>
@@ -33,8 +33,12 @@
                             {% if user in partido.jugadores.all %}
                                 <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-danger btn-sm w-100">Salir del partido</a>
                             {% elif partido.estado == 'Abierto' %}
-                                <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-primary btn-sm w-100">Unirse al partido</a>
+                                <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-warning btn-sm w-100">Unirse al partido</a>
                             {% endif %}
+                            <a href="https://wa.me/?text={{ partido.mensaje_whatsapp|urlencode }}" class="btn btn-success btn-sm w-100 mt-2" target="_blank">
+                                <i class="bi bi-whatsapp"></i> Compartir
+                            </a>
+                            
                         </div>
                     </div>
                 </div>

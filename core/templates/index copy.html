@@ -7,35 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <style>
-        body {
-            position: relative;
-            min-height: 100vh;
-            background: url("{% static 'img/bolas.jpg' %}") no-repeat center center fixed;
-            background-size: cover;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            z-index: 0;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-        }
-
-        .card {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-    </style>
 </head>
-<body class="d-flex justify-content-center align-items-center">
+<body class="bg-light d-flex justify-content-center align-items-center min-vh-100">
 
     <div class="container py-4">
         <div class="row justify-content-center align-items-start g-4">

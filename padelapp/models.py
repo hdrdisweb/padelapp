@@ -218,3 +218,32 @@ def save(self, *args, **kwargs):
     @classmethod
     def limpiar_partidos_viejos(cls):
         cls.objects.filter(estado='Cerrado', fecha__lt=now() - timedelta(days=1)).delete()
+
+
+# Modelo de Pareja (una pareja de dos jugadores)
+class Pareja(models.Model):
+    jugador_1 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pareja_j1')
+    jugador_2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pareja_j2')
+
+    def __str__(self):
+        return f"{self.jugador_1.apodo or self.jugador_1.username} / {self.jugador_2.apodo or self.jugador_2.username}"
+
+# Modelo de Alineación (por Pull)
+class Alineacion(models.Model):
+    pull = models.OneToOneField(CrearPull, on_delete=models.CASCADE, related_name='alineacion')
+    parejas = models.ManyToManyField(Pareja, through='ParejaEnPista')
+    suplentes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='suplente_en_alineaciones')
+    creada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Alineación para {self.pull.nombre}"
+
+# Relación entre Pareja y pista asignada
+class ParejaEnPista(models.Model):
+    alineacion = models.ForeignKey(Alineacion, on_delete=models.CASCADE)
+    pareja = models.ForeignKey(Pareja, on_delete=models.CASCADE)
+    pista = models.PositiveSmallIntegerField()  # Pista 1, 2, 3...
+
+    class Meta:
+        unique_together = ('alineacion', 'pareja')
+        ordering = ['pista']

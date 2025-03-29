@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Alineaciones para {{ pull.nombre }}</h2>
+
+    <form method="post" id="alineacionForm">
+        {% csrf_token %}
+
+        <div class="row">
+            {% for pista in "123"|make_list %}
+                <div class="col-md-4 mb-4">
+                    <div class="card border-primary shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <strong>Pista {{ pista }}</strong>
+                        </div>
+                        <div class="card-body pista-dropzone text-center" data-pista="{{ pista }}">
+                            {% if parejas_en_pista %}
+                                {% with pista_parejas=parejas_en_pista|dictsort:"pista" %}
+                                    {% for item in pista_parejas %}
+                                        {% if item.pista|stringformat:"i" == pista %}
+                                            {% if forloop.counter0|divisibleby:2 %}
+                                                <div class="mb-4 p-3 bg-light border rounded shadow-sm">
+                                                    <div class="d-flex justify-content-center gap-2 mb-1">
+                                                        <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.pareja.jugador_1.id }}">
+                                                            {{ item.pareja.jugador_1.apodo|default:item.pareja.jugador_1.username }}
+                                                        </div>
+                                                        <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.pareja.jugador_2.id }}">
+                                                            {{ item.pareja.jugador_2.apodo|default:item.pareja.jugador_2.username }}
+                                                        </div>
+                                                    </div>
+                                            {% else %}
+                                                    <div class="mb-2 fw-bold">VS</div>
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.pareja.jugador_1.id }}">
+                                                            {{ item.pareja.jugador_1.apodo|default:item.pareja.jugador_1.username }}
+                                                        </div>
+                                                        <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.pareja.jugador_2.id }}">
+                                                            {{ item.pareja.jugador_2.apodo|default:item.pareja.jugador_2.username }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Jugadores disponibles -->
+        <div class="card mt-4 border-warning">
+            <div class="card-header bg-warning">
+                <strong>Jugadores disponibles</strong>
+            </div>
+            <div class="card-body d-flex flex-wrap gap-2" id="jugadoresContainer">
+                {% for jugador in jugadores %}
+                    <div class="player-box border p-2 rounded bg-light" draggable="true" data-user-id="{{ jugador.id }}">
+                        {{ jugador.apodo|default:jugador.username }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <input type="hidden" name="alineacion_data" id="alineacionData">
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'lista_pulls' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        
+            <button type="submit" class="btn btn-success">Guardar Alineación</button>
+        
+            {% if alineacion %}
+                <button onclick="window.print()" type="button" class="btn btn-outline-dark">
+                    <i class="bi bi-printer"></i> Imprimir o Guardar como PDF
+                </button>
+            {% endif %}
+        </div>
+        
+    </form>
+</div>
+
+<!-- Estilos -->
+<style>
+    .player-box {
+        width: 120px;
+        text-align: center;
+        cursor: grab;
+    }
+
+    .pista-dropzone {
+        min-height: 140px;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border: 2px dashed #007bff;
+        border-radius: 5px;
+    }
+
+    @media print {
+        .btn, header, nav, footer {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 0;
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Scripts -->
+<script>
+    let dragged = null;
+
+    document.querySelectorAll('.player-box').forEach(el => {
+        el.addEventListener('dragstart', e => {
+            dragged = el;
+            e.dataTransfer.effectAllowed = 'move';
+        });
+    });
+
+    document.querySelectorAll('.pista-dropzone, #jugadoresContainer').forEach(zone => {
+        zone.addEventListener('dragover', e => e.preventDefault());
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            if (dragged) zone.appendChild(dragged);
+        });
+    });
+
+    document.getElementById('alineacionForm').addEventListener('submit', e => {
+        const data = [];
+        document.querySelectorAll('.pista-dropzone').forEach((zone) => {
+            const pista = zone.dataset.pista;
+            const jugadores = Array.from(zone.querySelectorAll('.player-box')).map(div => div.dataset.userId);
+            for (let i = 0; i < jugadores.length; i += 2) {
+                if (jugadores[i+1]) {
+                    data.push({ pista, jugador1: jugadores[i], jugador2: jugadores[i+1] });
+                }
+            }
+        });
+
+        const suplentes = Array.from(document.querySelectorAll('#jugadoresContainer .player-box')).map(div => div.dataset.userId);
+        document.getElementById('alineacionData').value = JSON.stringify({
+            parejas: data,
+            suplentes: suplentes
+        });
+    });
+</script>
+{% endblock %}

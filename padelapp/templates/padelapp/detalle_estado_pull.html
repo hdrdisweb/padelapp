@@ -35,5 +35,9 @@
 
 
     <a href="{% url 'lista_pulls' %}" class="btn btn-secondary mt-4">Volver a la lista</a>
+    <a href="https://wa.me/?text={{ mensaje_whatsapp|urlencode }}" class="btn btn-success" target="_blank">
+        <i class="bi bi-whatsapp"></i> Compartir por WhatsApp
+    </a>
+    
 </div>
 {% endblock %}
