@@ -34,10 +34,43 @@
 </ul>
 
 
-    <a href="{% url 'lista_pulls' %}" class="btn btn-secondary mt-4">Volver a la lista</a>
-    <a href="https://wa.me/?text={{ mensaje_whatsapp|urlencode }}" class="btn btn-success" target="_blank">
-        <i class="bi bi-whatsapp"></i> Compartir por WhatsApp
-    </a>
+    <div class="d-flex gap-2 mt-4">
+        <a href="{% url 'lista_pulls' %}" class="btn btn-secondary">Volver a la lista</a>
     
+        <!-- Botón para abrir modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inscripcionModal">
+            <i class="bi bi-person-check"></i> Inscribirme
+        </button>
+    </div>
+    
+        
 </div>
+
+<!-- Modal de inscripción -->
+<div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inscripcionModalLabel">Inscribirme en {{ pull.nombre }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'inscribirse_pull' pull.id %}">
+                    {% csrf_token %}
+                    <label for="tipo">Selecciona tu posición:</label>
+                    <select name="tipo" id="tipo" class="form-select" required>
+                        <option value="Titular">Titular</option>
+                        <option value="Reserva">Reserva</option>
+                        <option value="No puedo asistir">No puedo asistir</option>
+                    </select>
+                    <div class="modal-footer mt-3">
+                        <button type="submit" class="btn btn-primary">Confirmar inscripción</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

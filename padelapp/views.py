@@ -9,7 +9,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.db import IntegrityError
 from django.db import models
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.utils.timezone import now
 from django.conf import settings
 from datetime import timedelta
@@ -19,10 +21,13 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Alineacion, Pareja, ParejaEnPista
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-
-
-
-
+from .models import Team, User
+from .models import Convocatoria, Team, ConvocatoriaJugador
+from .forms import ConvocatoriaForm
+from .forms import TeamForm
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.http import urlencode
+from .models import AlineacionConvocatoria, ParejaConvocatoria, SuplenteConvocatoria
 
 
 @login_required
@@ -88,9 +93,23 @@ def crear_pull(request):
     
     return render(request, 'padelapp/pull_form.html')
 
+
+# lista pull
 def lista_pulls(request):
     pulls = CrearPull.objects.all()
+
+    for pull in pulls:
+        url = request.build_absolute_uri(reverse('lista_pulls'))
+        pull.mensaje_whatsapp = (
+            f"🎾 ¡Pull \"{pull.nombre}\" disponible!\n"
+            f"📅 {pull.fecha} ⏰ {pull.hora}\n"
+            f"👉 Apúntate: {url}"
+        )
+
+
     return render(request, 'padelapp/lista_pulls.html', {'pulls': pulls})
+
+# detalle pull
 
 def detalle_pull(request, id):
     pull = get_object_or_404(CrearPull, id=id)
@@ -269,7 +288,7 @@ def lista_partidos(request):
 
     for partido in partidos:
         url = request.build_absolute_uri(reverse('gestionar_partido', args=[partido.id]))
-        partido.mensaje_whatsapp = f"🎾 ¡Sumate al partido en {partido.lugar}!\n🗓️ {partido.fecha} ⏰ {partido.hora}\n👉 {url}"
+        partido.mensaje_whatsapp = f"🎾 ¡Sumate al partido en (necesitás iniciar sesión para unirte){partido.lugar}!\n🗓️ {partido.fecha} ⏰ {partido.hora}\n👉 {url}"
 
     return render(request, 'padelapp/lista_partidos.html', {'partidos': partidos})
 
@@ -290,6 +309,20 @@ def gestionar_partido(request, partido_id):
             messages.error(request, 'El partido ya está completo.')
 
     partido.save()
+    return redirect('lista_partidos')
+
+# eliminar partidos
+
+@login_required
+def eliminar_partido(request, partido_id):
+    partido = get_object_or_404(PartidoAbierto, id=partido_id)
+
+    if request.user == partido.creador or request.user.is_staff:
+        partido.delete()
+        messages.success(request, "Partido eliminado correctamente.")
+    else:
+        messages.error(request, "No tenés permiso para eliminar este partido.")
+
     return redirect('lista_partidos')
 
 # Notificaciones
@@ -453,12 +486,366 @@ def gestionar_alineacion(request, pull_id):
     alineacion_url = request.build_absolute_uri(reverse('gestionar_alineacion', args=[pull.id]))
     mensaje_whatsapp = f"¡Mirá la alineación de {pull.nombre}! 👉 {alineacion_url}"
 
-
     context = {
         'pull': pull,
         'jugadores': jugadores_disponibles,
         'alineacion': alineacion,
         'parejas_en_pista': parejas_en_pista,
         'mensaje_whatsapp': mensaje_whatsapp,
+        'volver_url': reverse('lista_pulls'),
     }
+
     return render(request, 'padelapp/gestionar_alineacion.html', context)
+
+
+# equipos
+
+@login_required
+def lista_equipos(request):
+    equipos = Team.objects.all()
+    return render(request, 'padelapp/lista_equipos.html', {'equipos': equipos})
+
+@login_required
+def detalle_equipo(request, id):
+    equipo = get_object_or_404(Team, id=id)
+    jugadores = User.objects.filter(equipo=equipo)
+    return render(request, 'padelapp/detalle_equipo.html', {'equipo': equipo, 'jugadores': jugadores})
+
+# CRUD equipo
+
+# ✅ Solo admins
+def es_admin(user):
+    return user.is_authenticated and user.is_staff
+
+@user_passes_test(es_admin)
+def crear_equipo(request):
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Equipo creado correctamente.')
+            return redirect('lista_equipos')
+    else:
+        form = TeamForm()
+    return render(request, 'padelapp/form_equipo.html', {'form': form})
+
+@user_passes_test(es_admin)
+def editar_equipo(request, equipo_id):
+    equipo = get_object_or_404(Team, id=equipo_id)
+    if request.method == 'POST':
+        form = TeamForm(request.POST, instance=equipo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Equipo actualizado correctamente.')
+            return redirect('lista_equipos')
+    else:
+        form = TeamForm(instance=equipo)
+    
+    return render(request, 'padelapp/form_equipo.html', {'form': form, 'editar': True})
+
+
+@user_passes_test(es_admin)
+def eliminar_equipo(request, id):
+    equipo = get_object_or_404(Team, id=id)
+
+    if request.method == 'POST':
+        equipo.delete()
+        messages.success(request, 'Equipo eliminado correctamente.')
+        return redirect('lista_equipos')
+
+    return render(request, 'padelapp/confirmar_eliminar_equipo.html', {'equipo': equipo})
+
+
+
+
+# convocatorias
+
+def es_admin(user):
+    return user.is_superuser or user.is_staff
+
+@user_passes_test(es_admin)
+@login_required
+def crear_convocatoria(request):
+    equipo_id = request.GET.get('equipo')
+    tipo_equipo = None
+
+    if request.method == 'POST':
+        form = ConvocatoriaForm(request.POST, equipo_id=request.POST.get('equipo'))
+        if form.is_valid():
+            convocatoria = form.save(commit=False)
+            convocatoria.creada_por = request.user
+            convocatoria.save()
+
+            jugadores = form.cleaned_data['jugadores']
+            for jugador in jugadores:
+                ConvocatoriaJugador.objects.create(convocatoria=convocatoria, jugador=jugador)
+
+            return redirect('lista_convocatorias')
+    else:
+        initial_data = {}
+        if equipo_id:
+            initial_data['equipo'] = equipo_id
+        form = ConvocatoriaForm(initial=initial_data, equipo_id=equipo_id)
+
+
+    if equipo_id:
+        try:
+            equipo = Team.objects.get(id=equipo_id)
+            tipo_equipo = equipo.tipo
+        except Team.DoesNotExist:
+            pass
+
+    return render(request, 'padelapp/crear_convocatoria.html', {
+        'form': form,
+        'tipo_equipo': tipo_equipo
+    })
+
+
+
+@login_required
+def detalle_convocatoria(request, pk):
+    convocatoria = Convocatoria.objects.get(pk=pk)
+    
+    # Jugadores convocados
+    jugadores = ConvocatoriaJugador.objects.filter(convocatoria=convocatoria)
+
+    # Jugador actual (si está convocado)
+    try:
+        convocatoria_jugador = ConvocatoriaJugador.objects.get(convocatoria=convocatoria, jugador=request.user)
+    except ObjectDoesNotExist:
+        convocatoria_jugador = None
+
+    # Procesar respuesta del jugador
+    if request.method == 'POST':
+        respuesta = request.POST.get('respuesta')
+        if respuesta:
+            if convocatoria_jugador:
+                convocatoria_jugador.respuesta = respuesta
+                convocatoria_jugador.confirmado = True
+                convocatoria_jugador.save()
+            else:
+                ConvocatoriaJugador.objects.create(
+                    convocatoria=convocatoria,
+                    jugador=request.user,
+                    respuesta=respuesta,
+                    confirmado=True
+                )
+            messages.success(request, f"Tu respuesta fue registrada: {respuesta}")
+            return redirect('detalle_convocatoria', pk=convocatoria.id)
+
+    # Contadores para resumen
+    pueden_count = jugadores.filter(respuesta='PUEDO').count()
+    no_pueden_count = jugadores.filter(respuesta='NO PUEDO').count()
+    sin_respuesta_count = jugadores.filter(respuesta__isnull=True).count()
+
+    # Mensaje para compartir por WhatsApp
+    mensaje_whatsapp = f"""📋 *Convocatoria de {convocatoria.equipo.nombre} ({convocatoria.equipo.tipo})* 
+📅 {convocatoria.fecha.strftime('%d/%m/%Y')} ⏰ {convocatoria.hora.strftime('%H:%M')}
+📍 {convocatoria.lugar}
+👉 Confirmá tu asistencia entrando a:
+http://tusitio.com/padel/convocatorias/{convocatoria.id}/
+"""
+
+    return render(request, 'padelapp/detalle_convocatoria.html', {
+        'convocatoria': convocatoria,
+        'jugadores': jugadores,
+        'convocatoria_jugador': convocatoria_jugador,
+        'mensaje_whatsapp': mensaje_whatsapp,
+        'pueden_count': pueden_count,
+        'no_pueden_count': no_pueden_count,
+        'sin_respuesta_count': sin_respuesta_count,
+    })
+
+@login_required
+def lista_convocatorias(request):
+    convocatorias = Convocatoria.objects.all().order_by('-fecha')
+    return render(request, 'padelapp/lista_convocatorias.html', {'convocatorias': convocatorias})
+
+
+def es_admin(user):
+    return user.is_authenticated and user.is_staff
+
+@user_passes_test(es_admin)
+def editar_convocatoria(request, pk):
+    convocatoria = get_object_or_404(Convocatoria, pk=pk)
+    equipo_id = convocatoria.equipo.id
+
+    if request.method == 'POST':
+        form = ConvocatoriaForm(request.POST, instance=convocatoria, equipo_id=equipo_id)
+        if form.is_valid():
+            convocatoria = form.save()
+
+            # ✅ Limpiamos los convocados anteriores
+            ConvocatoriaJugador.objects.filter(convocatoria=convocatoria).delete()
+
+            # ✅ Creamos nuevos registros
+            jugadores = form.cleaned_data['jugadores']
+            for jugador in jugadores:
+                ConvocatoriaJugador.objects.create(convocatoria=convocatoria, jugador=jugador)
+
+            return redirect('detalle_convocatoria', pk=convocatoria.pk)
+    else:
+        # 🧠 Setear como seleccionados los jugadores actuales
+        jugadores_ids = convocatoria.jugadores_convocados.values_list('jugador__id', flat=True)
+        form = ConvocatoriaForm(instance=convocatoria, equipo_id=equipo_id, initial={'jugadores': jugadores_ids})
+
+    return render(request, 'padelapp/editar_convocatoria.html', {
+        'form': form,
+        'tipo_equipo': convocatoria.equipo.tipo
+    })
+
+@user_passes_test(es_admin)
+def eliminar_convocatoria(request, convocatoria_id):
+    convocatoria = get_object_or_404(Convocatoria, id=convocatoria_id)
+
+    if request.method == 'POST':
+        convocatoria.delete()
+        messages.success(request, "Convocatoria eliminada correctamente.")
+        return redirect('lista_convocatorias')
+
+    return render(request, 'padelapp/confirmar_eliminar_convocatoria.html', {'convocatoria': convocatoria})
+
+
+#gestionar alinaciones de lapa y snp
+
+@user_passes_test(es_admin)
+def gestionar_alineacion_lapa(request, convocatoria_id):
+    convocatoria = get_object_or_404(Convocatoria, pk=convocatoria_id)
+
+    jugadores = User.objects.filter(
+        id__in=ConvocatoriaJugador.objects.filter(convocatoria=convocatoria, respuesta='PUEDO').values_list('jugador_id', flat=True)
+    )
+
+    pareja_data = []
+    suplentes = []
+
+    try:
+        alineacion = convocatoria.alineacion  # OneToOne
+        pareja_data = ParejaConvocatoria.objects.filter(alineacion=alineacion)
+        suplentes = SuplenteConvocatoria.objects.filter(alineacion=alineacion).values_list('jugador_id', flat=True)
+    except AlineacionConvocatoria.DoesNotExist:
+        alineacion = None
+
+    if request.method == 'POST':
+        data_json = request.POST.get('alineacion_data')
+        if data_json:
+            data = json.loads(data_json)
+            AlineacionConvocatoria.objects.filter(convocatoria=convocatoria).delete()
+
+            alineacion = AlineacionConvocatoria.objects.create(convocatoria=convocatoria)
+
+            for pareja in data.get('parejas', []):
+                jugador1 = get_object_or_404(User, pk=pareja['jugador1'])
+                jugador2 = get_object_or_404(User, pk=pareja['jugador2'])
+                pista = int(pareja['pista'])
+                ParejaConvocatoria.objects.create(
+                    alineacion=alineacion,
+                    jugador_1=jugador1,
+                    jugador_2=jugador2,
+                    pista=pista
+                )
+
+            for suplente_id in data.get('suplentes', []):
+                jugador = get_object_or_404(User, pk=suplente_id)
+                SuplenteConvocatoria.objects.create(
+                    alineacion=alineacion,
+                    jugador=jugador
+                )
+
+            messages.success(request, "Alineación actualizada correctamente.")
+            return redirect('gestionar_alineacion_lapa', convocatoria_id=convocatoria_id)
+    pareja_ids = []
+    if pareja_data:
+        for p in pareja_data:
+            pareja_ids.append(p.jugador_1.id)
+            pareja_ids.append(p.jugador_2.id)
+
+    usados_ids = set(pareja_ids + list(suplentes))
+    jugadores_disponibles = jugadores.exclude(id__in=usados_ids)
+
+    volver_url = reverse('detalle_convocatoria', args=[convocatoria.id])
+    return render(request, 'padelapp/gestionar_alineacion.html', {
+        'convocatoria': convocatoria,
+        'jugadores_disponibles': jugadores_disponibles,
+        'alineacion': alineacion,
+        'parejas_en_pista': pareja_data,
+        'suplentes_ids': suplentes,
+        'num_pistas': "123",
+        'volver_url': volver_url,
+    })
+
+
+
+@user_passes_test(es_admin)
+def gestionar_alineacion_snp(request, convocatoria_id):
+    convocatoria = get_object_or_404(Convocatoria, pk=convocatoria_id)
+
+    # Jugadores que confirmaron que pueden asistir
+    jugadores = User.objects.filter(
+        id__in=ConvocatoriaJugador.objects.filter(convocatoria=convocatoria, respuesta='PUEDO')
+        .values_list('jugador_id', flat=True)
+    )
+
+    pareja_data = []
+    suplentes = []
+
+    try:
+        alineacion = convocatoria.alineacion  # OneToOne
+        pareja_data = ParejaConvocatoria.objects.filter(alineacion=alineacion)
+        suplentes = SuplenteConvocatoria.objects.filter(alineacion=alineacion).values_list('jugador_id', flat=True)
+    except AlineacionConvocatoria.DoesNotExist:
+        alineacion = None
+
+    if request.method == 'POST':
+        data_json = request.POST.get('alineacion_data')
+        if data_json:
+            data = json.loads(data_json)
+            AlineacionConvocatoria.objects.filter(convocatoria=convocatoria).delete()
+
+            alineacion = AlineacionConvocatoria.objects.create(convocatoria=convocatoria)
+
+            for pareja in data.get('parejas', []):
+                jugador1 = get_object_or_404(User, pk=pareja['jugador1'])
+                jugador2 = get_object_or_404(User, pk=pareja['jugador2'])
+                pista = int(pareja['pista'])
+
+                ParejaConvocatoria.objects.create(
+                    alineacion=alineacion,
+                    jugador_1=jugador1,
+                    jugador_2=jugador2,
+                    pista=pista
+                )
+
+            for suplente_id in data.get('suplentes', []):
+                jugador = get_object_or_404(User, pk=suplente_id)
+                SuplenteConvocatoria.objects.create(
+                    alineacion=alineacion,
+                    jugador=jugador
+                )
+
+            messages.success(request, "Alineación actualizada correctamente.")
+            return redirect('gestionar_alineacion_snp', convocatoria_id=convocatoria_id)
+
+    # Filtrar jugadores disponibles (no usados)
+    pareja_ids = []
+    if pareja_data:
+        for p in pareja_data:
+            pareja_ids.append(p.jugador_1.id)
+            pareja_ids.append(p.jugador_2.id)
+
+    usados_ids = set(pareja_ids + list(suplentes))
+    jugadores_disponibles = jugadores.exclude(id__in=usados_ids)
+
+    volver_url = reverse('detalle_convocatoria', args=[convocatoria.id])
+
+    return render(request, 'padelapp/gestionar_alineacion.html', {
+        'convocatoria': convocatoria,
+        'jugadores_disponibles': jugadores_disponibles,
+        'alineacion': alineacion,
+        'parejas_en_pista': pareja_data,
+        'suplentes_ids': suplentes,
+        'num_pistas': "12345",  # SNP usa 5 pistas
+        'volver_url': volver_url,
+    })
+
+

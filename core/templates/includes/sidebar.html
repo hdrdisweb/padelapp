@@ -26,7 +26,56 @@
         <li class="nav-heading">Convocatorias</li>
         <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>LAPA</span></a></li>
         <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>SNP</span></a></li>
-        
+
+        <li class="nav-heading">Convocatorias</li>
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#convocatorias-submenu" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-calendar-event "></i>
+              <span>Convocatorias</span>
+              <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="convocatorias-submenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+              <li>
+                <a href="{% url 'lista_convocatorias' %}">
+                  <i class="bi bi-list-ul fs-5"></i><span>Ver Convocatorias</span>
+                </a>
+              </li>
+              {% if request.user.is_superuser %}
+              <li>
+                <a href="{% url 'crear_convocatoria' %}">
+                  <i class="bi bi-calendar-plus fs-5"></i><span>Crear Convocatoria</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#equipos-submenu" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-people-fill"></i>
+              <span>Equipos</span>
+              <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="equipos-submenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+              <li>
+                <a href="{% url 'lista_equipos' %}">
+                  <i class="bi bi-list-ul fs-5"></i><span>Ver Equipos</span>
+                </a>
+              </li>
+              {% if request.user.is_superuser %}
+              <li>
+                <a href="{% url 'crear_equipo' %}">
+                  <i class="bi bi-plus-square fs-5"></i><span>Crear Equipo</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </li>
+          
+
+
+
         <li class="nav-heading">Varios</li>
         <li class="nav-item"><a class="nav-link collapsed" href="{% url 'faq' %}"><i class="bi bi-question-circle"></i><span>F.A.Q</span></a></li>
         <li class="nav-item"><a class="nav-link collapsed" href="{% url 'contacto' %}"><i class="bi bi-envelope"></i><span>Contacto</span></a></li>

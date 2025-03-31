@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Jugadores del equipo "{{ equipo.nombre }}"</h4>
+      <a href="{% url 'lista_equipos' %}" class="btn btn-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Volver a la lista
+      </a>
+    </div>
+
+    <div class="card-body">
+      {% if jugadores %}
+        <ul class="list-group list-group-flush">
+          {% for jugador in jugadores %}
+            <li class="list-group-item">
+              {{ jugador.apodo|default:jugador.username }} - {{ jugador.first_name }} {{ jugador.last_name }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">Este equipo no tiene jugadores aún.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

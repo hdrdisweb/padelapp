@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
-import dj_database_url
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# redirijir cuando alguien no esta logeado
+LOGIN_URL = '/login/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -17,11 +17,8 @@ SECRET_KEY = 'django-insecure-tegrx&gr$-nm&o!5_+#p598w9c@a00(r(6^%-^xsdz*^4fiu*@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "padelapp-production-5744.up.railway.app",  # Agrega tu dominio de Railway
-    "localhost",
-    "127.0.0.1"
-]
+ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -40,7 +37,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Debe estar aquí
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,13 +45,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'padelapp', 'templates')],
+        'DIRS': [
+    os.path.join(BASE_DIR, 'padelapp', 'templates'),
+    os.path.join(BASE_DIR, 'core', 'templates'),
+],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,10 +72,13 @@ WSGI_APPLICATION = 'padelapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Si la variable de entorno DATABASE_URL existe, usa PostgreSQL. Si no, usa SQLite.
 DATABASES = {
-    'default': dj_database_url.config(default=f'sqlite:///{os.path.join(os.path.dirname(__file__), "db.sqlite3")}')
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -114,11 +115,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "core", "static"),  # Asegura que esta ruta apunta a tus archivos
 ]
+
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Para la recolección de archivos estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -127,3 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'padelapp.User'
 
+# correo contacto
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.ionos.es'  # ej: smtp.ionos.es
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'info@xn--hdrdiseoweb-7db.es'
+EMAIL_HOST_PASSWORD = 'HDRdisweb@123456'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

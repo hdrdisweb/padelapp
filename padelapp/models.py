@@ -4,6 +4,7 @@ from django.conf import settings  # Para usar AUTH_USER_MODEL
 from django.utils.timezone import now, timedelta
 from django.contrib.auth.models import User
 
+
 # Modelo de Usuario
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
@@ -22,15 +23,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
     
-    
-# Modelo de Equipo
-class Team(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-# Modelo de Pull (Partidos abiertos para inscribirse)
+    # Modelo de Pull (Partidos abiertos para inscribirse)
 class Pull(models.Model):
     match = models.ForeignKey('Match', on_delete=models.CASCADE, null=True, blank=True)
     pull_asociada = models.ForeignKey('CrearPull', on_delete=models.CASCADE, null=True, blank=True)
@@ -247,3 +240,97 @@ class ParejaEnPista(models.Model):
     class Meta:
         unique_together = ('alineacion', 'pareja')
         ordering = ['pista']
+
+
+# Modelo de Equipo
+class Team(models.Model):
+    TIPO_CONVOCATORIA = [
+        ('LAPA 3', 'LAPA 3'),
+        ('LAPA 4', 'LAPA 4'),
+        ('SNP 500', 'SNP 500'),
+        ('SNP 1000', 'SNP 1000'),
+    ]
+
+    nombre = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=20, choices=TIPO_CONVOCATORIA)
+
+    def __str__(self):
+        return self.nombre
+
+
+
+# convocatorias
+
+class Convocatoria(models.Model):
+    equipo = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='convocatorias')
+    fecha = models.DateField()
+    hora = models.TimeField()
+    lugar = models.CharField(max_length=200)
+    creada_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.equipo.tipo} - {self.equipo.nombre} ({self.fecha})"
+
+
+class ConvocatoriaJugador(models.Model):
+    TIPO_RESPUESTA = [
+        ('PUEDO', 'PUEDO'),
+        ('NO PUEDO', 'NO PUEDO'),
+    ]
+
+    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE, related_name='jugadores_convocados')
+    jugador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    respuesta = models.CharField(max_length=10, choices=TIPO_RESPUESTA, blank=True, null=True)
+    confirmado = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('convocatoria', 'jugador')
+
+    def __str__(self):
+        return f"{self.jugador.username} en {self.convocatoria} - {self.respuesta or 'Sin respuesta'}"
+
+
+class ConvocatoriaPareja(models.Model):
+    jugador_1 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='convocatoria_pareja_j1')
+    jugador_2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='convocatoria_pareja_j2')
+
+    def __str__(self):
+        return f"{self.jugador_1.username} / {self.jugador_2.username}"
+
+class ParejaEnPistaConvocatoria(models.Model):
+    convocatoria = models.ForeignKey(Convocatoria, on_delete=models.CASCADE, related_name='pistas')
+    pareja = models.ForeignKey(ConvocatoriaPareja, on_delete=models.CASCADE)
+    pista = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = ('convocatoria', 'pareja')
+        ordering = ['pista']
+
+# convocatorias lapa y snp
+
+class AlineacionConvocatoria(models.Model):
+    convocatoria = models.OneToOneField('Convocatoria', on_delete=models.CASCADE, related_name='alineacion')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Alineación de {self.convocatoria}"
+
+
+class ParejaConvocatoria(models.Model):
+    alineacion = models.ForeignKey(AlineacionConvocatoria, on_delete=models.CASCADE, related_name='parejas')
+    jugador_1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pareja_conv_j1')
+    jugador_2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pareja_conv_j2')
+    pista = models.IntegerField()
+
+    def __str__(self):
+        return f"Pista {self.pista}: {self.jugador_1} y {self.jugador_2}"
+
+
+class SuplenteConvocatoria(models.Model):
+    alineacion = models.ForeignKey(AlineacionConvocatoria, on_delete=models.CASCADE, related_name='suplentes')
+    jugador = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Suplente: {self.jugador}"

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Convocatoria: {{ convocatoria.equipo.nombre }} ({{ convocatoria.equipo.tipo }})</h4>
+      
+      {% if user.is_staff %}
+      <a href="https://wa.me/?text={{ mensaje_whatsapp|urlencode }}" target="_blank" class="btn btn-success btn-sm">
+        <i class="bi bi-whatsapp"></i> Compartir por WhatsApp
+      </a>
+    
+      {% if convocatoria.equipo.tipo == "LAPA 3" or convocatoria.equipo.tipo == "LAPA 4" %}
+        <a href="{% url 'gestionar_alineacion_lapa' convocatoria.id %}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-people-fill"></i> Alineaciones
+        </a>
+      {% elif convocatoria.equipo.tipo == "SNP 500" or convocatoria.equipo.tipo == "SNP 1000" %}
+        <a href="{% url 'gestionar_alineacion_snp' convocatoria.id %}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-people-fill"></i> Alineaciones
+        </a>
+      {% endif %}
+    {% endif %}
+    
+    <a href="{% url 'lista_convocatorias' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    
+    </div>
+
+    <div class="card-body">
+      <p><strong>Fecha:</strong> {{ convocatoria.fecha|date:"d/m/Y" }} {{ convocatoria.hora|time:"H:i" }}</p>
+      <p><strong>Ubicación:</strong> {{ convocatoria.lugar }}</p>
+
+      <hr>
+
+      {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    
+    <h5>Jugadores convocados:</h5>
+    
+    <div class="mb-3">
+      <h6>Resumen:</h6>
+      <ul class="list-inline">
+        <li class="list-inline-item">
+          <i class="bi bi-check-circle-fill text-success"></i> Pueden: <strong>{{ pueden_count }}</strong>
+        </li>
+        <li class="list-inline-item">
+          <i class="bi bi-x-circle-fill text-danger"></i> No pueden: <strong>{{ no_pueden_count }}</strong>
+        </li>
+        <li class="list-inline-item">
+          <i class="bi bi-question-circle text-muted"></i> Sin respuesta: <strong>{{ sin_respuesta_count }}</strong>
+        </li>
+      </ul>
+    </div>
+    
+    <table class="table table-bordered align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Jugador</th>
+          <th>Respuesta</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        {% for j in jugadores %}
+        <tr>
+          <td>{{ j.jugador.apodo|default:j.jugador.username }}</td>
+          <td>
+            {% if j.jugador.id|stringformat:"s" == request.user.id|stringformat:"s" %}
+            <form method="post" style="display: flex; justify-content: center; gap: 10px;">
+              {% csrf_token %}
+              <button name="respuesta" value="PUEDO" class="btn btn-outline-success btn-sm">Puedo</button>
+              <button name="respuesta" value="NO PUEDO" class="btn btn-outline-danger btn-sm">No puedo</button>
+            </form>
+          {% else %}
+            {{ j.respuesta|default:"Sin respuesta" }}
+          {% endif %}
+                    </td>
+          <td>
+            {% if j.respuesta == "PUEDO" %}
+              <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            {% elif j.respuesta == "NO PUEDO" %}
+              <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+            {% else %}
+              <span class="text-muted">–</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    </div>
+  </div>
+</div>
+{% endblock %}
