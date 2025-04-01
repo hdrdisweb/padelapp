@@ -140,3 +140,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'info@xn--hdrdiseoweb-7db.es'
 EMAIL_HOST_PASSWORD = 'HDRdisweb@123456'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# Media (archivos subidos por usuarios)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

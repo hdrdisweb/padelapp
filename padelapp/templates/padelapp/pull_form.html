@@ -1,44 +1,57 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">{% if pull %}Editar Pull{% else %}Crear Pull{% endif %}</h2>
+    <div class="card shadow-lg">
+        <div class="card-body">
 
-    <!-- Alerta de éxito -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert" id="successAlert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+            <h2 class="mt-5 mb-4">
+                <i class="bi bi-pencil-square me-2"></i>
+                {% if pull %}Editar Pull{% else %}Crear Pull{% endif %}
+            </h2>
 
-    <form method="post" action="{% if pull %}{% url 'editar_pull' pull.id %}{% else %}{% url 'crear_pull' %}{% endif %}" class="p-4 bg-light rounded shadow-sm" id="pullForm">
-        {% csrf_token %}
-        
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre del Pull</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Pull del viernes" value="{{ pull.nombre|default:'' }}" required>
+            <!-- Alerta de éxito -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success" role="alert" id="successAlert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Formulario -->
+            <form method="post"
+                  action="{% if pull %}{% url 'editar_pull' pull.id %}{% else %}{% url 'crear_pull' %}{% endif %}"
+                  class="p-4 bg-light rounded shadow-sm"
+                  id="pullForm">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre del Pull</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Pull del viernes" value="{{ pull.nombre|default:'' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <input type="date" id="fecha" name="fecha" class="form-control" value="{{ pull.fecha|date:'Y-m-d' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="hora" class="form-label">Hora</label>
+                    <input type="time" id="hora" name="hora" class="form-control" value="{{ pull.hora|default:'' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="max_jugadores" class="form-label">Máximo de Jugadores</label>
+                    <input type="number" id="max_jugadores" name="max_jugadores" class="form-control" value="{{ pull.max_jugadores|default:12 }}" min="1" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">{% if pull %}Guardar cambios{% else %}Crear Pull{% endif %}</button>
+                <a href="{% url 'lista_pulls' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+
         </div>
-
-        <div class="mb-3">
-            <label for="fecha" class="form-label">Fecha</label>
-            <input type="date" id="fecha" name="fecha" class="form-control" value="{{ pull.fecha|date:'Y-m-d' }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="hora" class="form-label">Hora</label>
-            <input type="time" id="hora" name="hora" class="form-control" value="{{ pull.hora|default:'' }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="max_jugadores" class="form-label">Máximo de Jugadores</label>
-            <input type="number" id="max_jugadores" name="max_jugadores" class="form-control" value="{{ pull.max_jugadores|default:12 }}" min="1" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">{% if pull %}Guardar cambios{% else %}Crear Pull{% endif %}</button>
-        <a href="{% url 'lista_pulls' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
 
 <!-- Validación en vivo con JS -->

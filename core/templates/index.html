@@ -5,13 +5,17 @@
     <meta charset="UTF-8">
     <title>Bienvenido a PadelApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Estilos -->
     <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
     <style>
         body {
             position: relative;
             min-height: 100vh;
-            background: url("{% static 'img/bolas.jpg' %}") no-repeat center center fixed;
+            background: url("{% static 'img/pala-padel.jpg' %}") no-repeat center center fixed;
             background-size: cover;
         }
 
@@ -21,86 +25,62 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
             z-index: 0;
         }
 
-        .container {
+        main, .container {
             position: relative;
             z-index: 1;
         }
 
-        .card {
-            background-color: rgba(255, 255, 255, 0.9);
+        .hero-card {
+            background-color: rgba(75, 75, 75, 0.8); /* negro con 40% de opacidad */
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 2rem;
         }
     </style>
 </head>
-<body class="d-flex justify-content-center align-items-center">
+<body>
 
-    <div class="container py-4">
-        <div class="row justify-content-center align-items-start g-4">
-            
-            <!-- Card principal -->
-            <div class="col-12 col-md-6">
-                <div class="card p-4 shadow-lg text-center h-100" style="border-radius: 15px;">
-                    <h2 class="mb-3">Bienvenido a <strong>PadelApp</strong></h2>
-                    <p class="mb-4">Organizá y gestioná tus partidos de pádel.</p>
-                    <div class="d-grid gap-3">
-                        <a href="{% url 'login' %}" class="btn btn-primary">
-                            <i class="bi bi-box-arrow-in-right"></i> Ingresar
-                        </a>
-                        <a href="{% url 'register' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-person-plus"></i> Registrarse
-                        </a>
+    <!-- HERO full height dentro de una card -->
+    <section id="hero" class="hero d-flex align-items-center min-vh-100">
+        <div class="container">
+            <div class="card shadow-lg hero-card">
+                <div class="row gy-4 align-items-center">
+                    <!-- Texto principal -->
+                    <div class="col-lg-6 d-flex flex-column justify-content-center order-2 order-lg-1 text-lg-start text-center">
+                        <h1 class="mb-3 text-white" data-aos="fade-up">Bienvenido a <span class="text-primary">PadelAPP</span></h1>
+                        <h5 class="mb-4 text-light" data-aos="fade-up" data-aos-delay="100">Tu espacio para organizar partidos, gestionar equipos y vivir el pádel como nunca antes.</h5>
+                        <p class="mb-4 text-light" data-aos="fade-up" data-aos-delay="200" style="font-size: 17px;">
+                            Un sistema completo y fácil de usar para jugadores, capitanes y administradores. ¡Unite a la comunidad y empezá a jugar!
+                        </p>
+                        <div class="d-flex flex-column flex-md-row justify-content-center justify-content-lg-start gap-3" data-aos="fade-up" data-aos-delay="300">
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                            </a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-person-plus me-1"></i> Registrarse
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Imagen hero -->
+                    <div class="col-lg-6 order-1 order-lg-2 text-center" data-aos="zoom-out">
+                        <img src="{% static 'img/bolas.jpg' %}" class="img-fluid animated rounded" alt="Padel App Hero">
                     </div>
                 </div>
             </div>
-
-            <!-- Card usuarios demo -->
-            <div class="col-12 col-md-6">
-                <div class="card p-4 shadow-sm h-100" style="border-radius: 15px;">
-                    <h5 class="mb-3 text-center">
-                        <i class="bi bi-people-fill me-2"></i>Usuarios de prueba
-                    </h5>
-                    <p class="small text-muted text-center mb-3">
-                        Iniciá sesión con alguno de los siguientes usuarios:
-                    </p>
-
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Usuario</th>
-                                    <th>Contraseña</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for i in "12345678910" %}
-                                <tr>
-                                    <td>jugador{{ i }}</td>
-                                    <td><span class="badge bg-secondary">password123</span></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <p class="text-center text-muted small mb-0">
-                        Contraseña igual para todos: <strong>password123</strong>
-                    </p>
-                    <hr>
-                    <p class="text-center text-muted small mb-0">
-                        ¿Preferís usar tus propios datos?  
-                        <a href="{% url 'register' %}" class="text-decoration-none fw-semibold">
-                            ¡Registrate acá!
-                        </a>
-                    </p>
-                </div>
-            </div>
-
         </div>
-    </div>
+    </section>
 
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Scripts -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
 </body>
 </html>

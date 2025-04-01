@@ -3,7 +3,89 @@
 <section class="section dashboard">
     <div class="container">
         <div class="row justify-content-center gy-4">
-<!-- Ayuda / FAQ -->
+
+            <div class="row gy-4">
+    
+                <!-- Convocatorias Abiertas -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card info-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Convocatorias Abiertas</h5>
+                            <div class="d-flex justify-content-center align-items-center my-3">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3 bg-success text-white" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-megaphone-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ cant_convocatorias_abiertas }}</h6>
+                                    <small class="text-muted">activas actualmente</small>
+                                </div>
+                            </div>
+                            <a href="{% url 'lista_convocatorias' %}" class="btn btn-outline-success btn-sm">
+                                Ver Convocatorias
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-md-6 col-lg-4">
+                    <div class="card info-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Partidos Abiertos</h5>
+                
+                            <!-- Icono y contador -->
+                            <div class="d-flex justify-content-center align-items-center my-3">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3 bg-warning text-white" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-people-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ cant_partidos_abiertos }}</h6>
+                                    <small class="text-muted">esperando jugadores</small>
+                                </div>
+                            </div>
+                
+                            <!-- Botón ver partidos -->
+                            <a href="{% url 'lista_partidos' %}" class="btn btn-outline-warning btn-sm mb-3">
+                                Ver Partidos
+                            </a>
+                
+                            <!-- Línea divisoria -->
+                            <hr class="my-3">
+                
+                            <!-- Botón crear partido -->
+                            <h5 class="mb-2">¿Listo para jugar?</h5>
+                            <a href="{% url 'crear_partido' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Crear nuevo partido
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            
+                <!-- Pulls Disponibles -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card info-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Pulls Disponibles</h5>
+                            <div class="d-flex justify-content-center align-items-center my-3">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3 bg-info text-white" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-layers fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ cant_pulls_disponibles }}</h6>
+                                    <small class="text-muted">Participa en las pulls activas</small>
+                                </div>
+                            </div>
+                            <a href="{% url 'lista_pulls' %}" class="btn btn-outline-info btn-sm">
+                                Ver Pulls
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+            
+
+            <!-- Ayuda / FAQ -->
 <div class="col-md-8">
     <div class="card text-center shadow-sm">
         <div class="card-body">
@@ -17,24 +99,7 @@
         </div>
     </div>
 </div>
-            <!-- Partidos Programados -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card info-card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Partidos Programados <span class="text-muted small">| Esta semana</span></h5>
-                        <div class="d-flex justify-content-center align-items-center my-3">
-                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center me-3 bg-primary text-white" style="width: 50px; height: 50px;">
-                                <i class="bi bi-calendar-event fs-4"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">5</h6>
-                                <small class="text-success fw-bold">+2</small> <small class="text-muted">más que la semana pasada</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+           
             <!-- Estadísticas del Jugador -->
             <div class="col-md-6 col-lg-4">
                 <div class="card info-card h-100 shadow-sm">
@@ -49,20 +114,7 @@
                 </div>
             </div>
 
-            <!-- Próximos Partidos -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card info-card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Próximos Partidos</h5>
-                        <ul class="list-group list-group-flush text-start">
-                            <li class="list-group-item">📅 Miércoles 27 - 20:00 hs - Club Centro</li>
-                            <li class="list-group-item">📅 Viernes 29 - 19:30 hs - Padel Sur</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ranking del Jugador -->
+                        <!-- Ranking del Jugador -->
             <div class="col-md-6 col-lg-4">
                 <div class="card info-card h-100 shadow-sm">
                     <div class="card-body text-center">
@@ -73,18 +125,7 @@
                 </div>
             </div>
 
-            <!-- Acción Rápida -->
-            <div class="col-md-8">
-                <div class="card text-center shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">¿Listo para jugar?</h5>
-                        <a href="{% url 'crear_partido' %}" class="btn btn-primary btn-sm ">
-                            <i class="bi bi-plus-circle me-1"></i> Crear nuevo partido
-                        </a>
-                    </div>
-                </div>
-            </div>
-
+        
         </div>
     </div>
     

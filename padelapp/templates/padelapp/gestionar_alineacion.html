@@ -3,19 +3,25 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Alineaciones para {{ pull.nombre }}</h2>
+    <h2 class="mb-4">
+        Alineaciones para {{ convocatoria }} 
+        {% if pull.fecha %}
+            ({{ pull.fecha|date:"d/m/Y" }})
+        {% endif %}
+    </h2>
+    
 
     <form method="post" id="alineacionForm">
         {% csrf_token %}
-
+    
         <div class="row">
             {% for pista in num_pistas|make_list %}
-                <div class="col-md-4 mb-4">
-                    <div class="card border-primary shadow-sm">
+                <div class="col-12 col-md-4 mb-4 d-flex">
+                    <div class="card border-primary shadow-sm w-100 h-100">
                         <div class="card-header bg-primary text-white">
                             <strong>Pista {{ pista }}</strong>
                         </div>
-                        <div class="card-body pista-dropzone text-center" data-pista="{{ pista }}">
+                        <div class="card-body pista-dropzone text-center d-flex flex-column justify-content-center" data-pista="{{ pista }}">
                             {% if parejas_en_pista %}
                                 {% for item in parejas_en_pista %}
                                     {% if item.pista|stringformat:"i" == pista %}
@@ -30,7 +36,10 @@
                                                     </div>
                                                 </div>
                                         {% else %}
-                                                <div class="mb-2 fw-bold">VS</div>
+                                        {% if es_pull %}
+                                        <div class="mb-2 fw-bold">VS</div>
+                                    {% endif %}
+                                    
                                                 <div class="d-flex justify-content-center gap-2">
                                                     <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.jugador_1.id }}">
                                                         {{ item.jugador_1.apodo|default:item.jugador_1.username }}
@@ -45,11 +54,13 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
+                        
                     </div>
                 </div>
             {% endfor %}
         </div>
-
+        
+    
         <!-- Jugadores disponibles -->
         <div class="card mt-4 border-warning">
             <div class="card-header bg-warning">
@@ -63,9 +74,9 @@
                 {% endfor %}
             </div>
         </div>
-
+    
         <input type="hidden" name="alineacion_data" id="alineacionData">
-
+    
         <div class="d-flex flex-wrap justify-content-between mt-4 gap-2">
             <a href="{{ volver_url }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
@@ -74,18 +85,20 @@
             <button type="submit" class="btn btn-danger">
                 <i class="bi bi-save"></i> Guardar Alineación
             </button>
-
+    
             {% if alineacion %}
                 <button onclick="window.print()" type="button" class="btn btn-outline-dark">
                     <i class="bi bi-printer"></i> Imprimir / PDF
                 </button>
-
+    
                 <a href="https://wa.me/?text={{ mensaje_whatsapp|urlencode }}" class="btn btn-success" target="_blank">
                     <i class="bi bi-whatsapp"></i> Compartir
                 </a>
             {% endif %}
         </div>
     </form>
+      
+
 </div>
 
 <!-- Estilos -->

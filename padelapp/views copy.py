@@ -429,7 +429,7 @@ def lista_notificaciones(request):
     notifications = request.user.notifications.order_by('-created_at')
     return render(request, 'padelapp/notificaciones.html', {'notifications': notifications})
 
-# gestionar las alineaciones de pull
+# gestionar las alineaciones
 
 User = get_user_model()
 
@@ -470,21 +470,6 @@ def gestionar_alineacion(request, pull_id):
 
             messages.success(request, "Alineación guardada correctamente.")
             return redirect('gestionar_alineacion', pull_id=pull.id)
-
-    # ⚠️ Aquí armamos el contexto completo
-    context = {
-        'pull': pull,
-        'jugadores_disponibles': jugadores,
-        'alineacion': alineacion,
-        'parejas_en_pista': ParejaEnPista.objects.filter(alineacion=alineacion),
-        'num_pistas': "123",
-        'volver_url': reverse('lista_pulls'),
-        'mensaje_whatsapp': obtener_mensaje_whatsapp_pull(alineacion) if alineacion else '',
-        'es_pull': True,  # ✅ esto activa o desactiva el "VS" en el template
-    }
-
-    return render(request, 'padelapp/gestionar_alineacion.html', context)
-
 
     # Cargar parejas guardadas para mostrar en las pistas
     parejas_en_pista = None

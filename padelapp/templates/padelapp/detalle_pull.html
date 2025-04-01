@@ -2,37 +2,81 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Estado de la Pull: {{ pull.nombre }}</h2>
-    <p><strong>Fecha:</strong> {{ pull.fecha }}</p>
-    <p><strong>Hora:</strong> {{ pull.hora }}</p>
+    <div class="row gy-4">
 
-    <h3 class="mt-4">Titulares ({{ titulares|length }})</h3>
-    <ul class="list-group">
-        {% for jugador in titulares %}
-        <li class="list-group-item">{{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
-        {% empty %}
-        <li class="list-group-item text-muted">No hay titulares inscritos.</li>
-        {% endfor %}
-    </ul>
+        <!-- Info general de la Pull -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <i class="bi bi-info-circle-fill me-2"></i> Estado de la Pull: {{ pull.nombre }}
+                    </h4>
+                    <p><strong>📅 Fecha:</strong> {{ pull.fecha|date:"d/m/Y" }}</p>
+                    <p><strong>⏰ Hora:</strong> {{ pull.hora }}</p>
+                </div>
+            </div>
+        </div>
 
-    <h3 class="mt-4">Reservas ({{ reservas|length }})</h3>
-    <ul class="list-group">
-        {% for jugador in reservas %}
-        <li class="list-group-item">{{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
-        {% empty %}
-        <li class="list-group-item text-muted">No hay reservas inscritos.</li>
-        {% endfor %}
-    </ul>
+        <!-- Titulares -->
+        <div class="col-12">
+            <div class="card shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <strong><i class="bi bi-person-check-fill me-1"></i> Titulares ({{ titulares|length }})</strong>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for jugador in titulares %}
+                        <li class="list-group-item">
+                            {{ jugador.jugador.username }} – Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No hay titulares inscritos.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-    <h3 class="mt-4">No puedo asistir ({{ no_asisten|length }})</h3>
-    <ul class="list-group">
-        {% for jugador in no_asisten %}
-        <li class="list-group-item">{{ jugador.jugador.username }} - Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}</li>
-        {% empty %}
-        <li class="list-group-item text-muted">Nadie ha dicho que no puede asistir.</li>
-        {% endfor %}
-    </ul>
+        <!-- Reservas -->
+        <div class="col-12">
+            <div class="card shadow-sm border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <strong><i class="bi bi-person-dash-fill me-1"></i> Reservas ({{ reservas|length }})</strong>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for jugador in reservas %}
+                        <li class="list-group-item">
+                            {{ jugador.jugador.username }} – Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No hay reservas inscritos.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-    <a href="{% url 'lista_pulls' %}" class="btn btn-secondary mt-4">Volver a la lista</a>
+        <!-- No pueden asistir -->
+        <div class="col-12">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <strong><i class="bi bi-x-circle-fill me-1"></i> No pueden asistir ({{ no_asisten|length }})</strong>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for jugador in no_asisten %}
+                        <li class="list-group-item">
+                            {{ jugador.jugador.username }} – Inscrito: {{ jugador.timestamp|date:"d/m/Y H:i" }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">Nadie ha dicho que no puede asistir.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Botón volver -->
+        <div class="col-12 text-end">
+            <a href="{% url 'lista_pulls' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

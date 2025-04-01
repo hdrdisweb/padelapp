@@ -2,69 +2,81 @@
 {% load static %}
 
 {% block content %}
-<main class="main container py-5">
- 
-  <div class="row gy-4">
-    <div class="col-xl-6">
-      <div class="card p-4">
-        <h5 class="card-title text-center mb-4">Envíanos tu consulta</h5>
-        <form method="post" class="php-email-form">
-          {% csrf_token %}
-          <div class="row gy-4">
-            <div class="col-md-6">{{ form.name }}</div>
-            <div class="col-md-6">{{ form.email }}</div>
-            <div class="col-md-12">{{ form.subject }}</div>
-            <div class="col-md-12">{{ form.message }}</div>
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
 
-            <div class="col-md-12 text-center">
-              {% if messages %}
-                {% for message in messages %}
-                  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-              {% endif %}
-              <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+      <main class="main container py-4">
+        <div class="row gy-4">
+
+          <!-- Formulario de contacto -->
+          <div class="col-xl-6">
+            <div class="card p-4 shadow-sm">
+              <h5 class="card-title text-center mb-4">Envíanos tu consulta</h5>
+              <form method="post" class="php-email-form">
+                {% csrf_token %}
+                <div class="row gy-4">
+                  <div class="col-md-6">{{ form.name }}</div>
+                  <div class="col-md-6">{{ form.email }}</div>
+                  <div class="col-md-12">{{ form.subject }}</div>
+                  <div class="col-md-12">{{ form.message }}</div>
+
+                  <div class="col-md-12 text-center">
+                    {% if messages %}
+                      {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                      {% endfor %}
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
-        </form>
-      </div>
-    </div>
 
-    <div class="col-xl-6">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="info-box card text-center p-3">
-            <i class="bi bi-geo-alt fs-4"></i>
-            <h5 class="mt-2">Dirección</h5>
-            <p>Calle Clara CampoAmor<br>Rincón de la Victoria</p>
+          <!-- Información de contacto -->
+          <div class="col-xl-6">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-box card text-center p-3">
+                  <i class="bi bi-geo-alt fs-4"></i>
+                  <h5 class="mt-2">Dirección</h5>
+                  <p>Calle Clara CampoAmor<br>Rincón de la Victoria</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-box card text-center p-3">
+                  <i class="bi bi-envelope fs-4"></i>
+                  <h5 class="mt-2">Email</h5>
+                  <p>hdrdisweb@gmail.com</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-box card text-center p-3">
+                  <i class="bi bi-telephone fs-4"></i>
+                  <h5 class="mt-2">Teléfono</h5>
+                  <p>+34 657197344</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-box card text-center p-3">
+                  <i class="bi bi-clock fs-4"></i>
+                  <h5 class="mt-2">Horario</h5>
+                  <p>Lunes a Viernes<br>9:00 - 17:00</p>
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
-        <div class="col-md-6">
-          <div class="info-box card text-center p-3">
-            <i class="bi bi-envelope fs-4"></i>
-            <h5 class="mt-2">Email</h5>
-            <p>hdrdisweb@gmail.com</p>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="info-box card text-center p-3">
-            <i class="bi bi-telephone fs-4"></i>
-            <h5 class="mt-2">Teléfono</h5>
-            <p>+34 657197344</p>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="info-box card text-center p-3">
-            <i class="bi bi-clock fs-4"></i>
-            <h5 class="mt-2">Horario</h5>
-            <p>Lunes a Viernes<br>9:00 - 17:00</p>
-          </div>
-        </div>
-      </div>
+      </main>
+
     </div>
   </div>
-</main>
+</div>
+
+<!-- Desvanecer mensajes -->
 <script>
-  // Oculta automáticamente los mensajes después de 5 segundos
   setTimeout(function() {
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -74,5 +86,4 @@
     });
   }, 5000);
 </script>
-
 {% endblock %}

@@ -6,7 +6,8 @@ from padelapp.views import crear_partido, gestionar_partido, lista_partidos
 from .views import index
 from .views import contacto_view 
 from .views import faq_view
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("grappelli/", include("grappelli.urls")),
@@ -28,3 +29,5 @@ urlpatterns = [
     path('faq/', faq_view, name='faq'),
 ]
 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,11 +2,13 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Crear Partido</h4>
-        </div>
+    <div class="card shadow-lg">
         <div class="card-body">
+
+            <h2 class="mt-5 mb-4">
+                <i class="bi bi-plus-circle me-2"></i> Crear Partido
+            </h2>
+
             <form method="post">
                 {% csrf_token %}
 
@@ -25,8 +27,11 @@
                     <input type="text" name="lugar" class="form-control" placeholder="Ejemplo: Pista 3, Club Pádel City" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Crear Partido</button>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-check-circle me-1"></i> Crear Partido
+                </button>
             </form>
+
         </div>
     </div>
 </div>
