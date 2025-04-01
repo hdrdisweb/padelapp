@@ -3,69 +3,17 @@
 <section class="section dashboard">
     <div class="container">
         <div class="row justify-content-center gy-4">
-<!-- Ayuda / Guía de Uso -->
-<div class="col-md-12">
-    <div class="card shadow-sm">
+<!-- Ayuda / FAQ -->
+<div class="col-md-8">
+    <div class="card text-center shadow-sm">
         <div class="card-body">
-            <h5 class="card-title text-center mb-3">
-                <i class="bi bi-info-circle-fill me-2"></i> Guía rápida de uso
+            <h5 class="card-title mb-3">
+                <i class="bi bi-question-circle-fill me-2"></i> AYUDA
             </h5>
-
-            <h6 class="fw-bold mt-3">1. Tipos de Usuarios</h6>
-            <p><strong>Administrador</strong></p>
-            <ul>
-                <li>Gestiona usuarios, partidos, pulls, etc.</li>
-                <li>Edita perfiles, elimina jugadores, cierra o reabre partidos.</li>
-                <li>Crea reglas, categorías y envía notificaciones globales.</li>
-            </ul>
-            <p><strong>Jugador (usuario registrado normal)</strong></p>
-            <ul>
-                <li>Perfil editable (nombre, email, avatar, etc.).</li>
-                <li>Puede apuntarse y desapuntarse de partidos.</li>
-                <li>Puede crear nuevos partidos.</li>
-                <li>NO puede crear pull nuevas.</li>
-                <li>Recibe notificaciones si las habilita en ajustes.</li>
-            </ul>
-
-            <h6 class="fw-bold mt-3">2. Perfil de Usuario</h6>
-            <ul>
-                <li><strong>Descripción general:</strong> datos personales y preferencias.</li>
-                <li><strong>Editar perfil:</strong> nombre, email, sexo, posición, etc.</li>
-                <li><strong>Ajustes:</strong> notificaciones de partidos, pulls, LAPA, SNP.</li>
-                <li><strong>Cambiar contraseña:</strong> formulario seguro.</li>
-            </ul>
-
-            <h6 class="fw-bold mt-3">3. Funcionamiento de los Partidos</h6>
-            <p><strong>Crear un partido:</strong></p>
-            <ul>
-                <li>Cualquier jugador puede crearlo.</li>
-                <li>Debe indicar fecha, hora y lugar.</li>
-                <li>El creador queda automáticamente inscrito.</li>
-            </ul>
-            <p><strong>Unirse a un partido:</strong></p>
-            <ul>
-                <li>Haciendo clic en <em>“Apuntarse”</em>.</li>
-                <li>Si hay 4 jugadores, el partido se cierra automáticamente.</li>
-            </ul>
-            <p><strong>Salirse de un partido:</strong></p>
-            <ul>
-                <li>Clic en <em>“Quitarme”</em>.</li>
-                <li>Si hay menos de 4 jugadores, el partido se reabre.</li>
-            </ul>
-
-            <h6 class="fw-bold mt-3">4. Pulls</h6>
-            <ul>
-                <li>Grupos dinámicos por niveles, eventos o reglas.</li>
-                <li>Se usan para organizar las pulls o ligas internas.</li>
-                <li>Más reglas serán añadidas próximamente.</li>
-            </ul>
-
-            <h6 class="fw-bold mt-3">5. Notificaciones</h6>
-            <ul>
-                <li>Configurar desde el perfil del usuario.</li>
-                <li>Recibir avisos de cambios en la cuenta.</li>
-                <li>Notificaciones de partidos, Pulls, LAPA y SNP.</li>
-            </ul>
+            <p class="text-muted mb-3">¿Tenés dudas? Consultá la sección de preguntas frecuentes.</p>
+            <a href="{% url 'faq' %}" class="btn btn-outline-primary btn-sm ">
+                <i class="bi bi-info-lg me-1"></i> Ir a la ayuda
+            </a>
         </div>
     </div>
 </div>
@@ -130,7 +78,7 @@
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-3">¿Listo para jugar?</h5>
-                        <a href="{% url 'crear_partido' %}" class="btn btn-primary btn-lg">
+                        <a href="{% url 'crear_partido' %}" class="btn btn-primary btn-sm ">
                             <i class="bi bi-plus-circle me-1"></i> Crear nuevo partido
                         </a>
                     </div>

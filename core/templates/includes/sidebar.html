@@ -3,7 +3,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-grid"></i><span>Escritorio</span></a></li>
         
-        <li class="nav-heading">Encuentros</li>
+        <li class="nav-heading mt-4">Encuentros</li>
         <li class="nav-item">
             <a class="nav-link collapsed" href="{% url 'lista_partidos' %}">
                 <i class="bi bi-people"></i><span>Partidos</span>
@@ -22,12 +22,7 @@
 
             </ul>
         </li>
-        
-        <li class="nav-heading">Convocatorias</li>
-        <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>LAPA</span></a></li>
-        <li class="nav-item"><a class="nav-link collapsed" href="#"><i class="bi bi-list-ol"></i><span>SNP</span></a></li>
-
-        <li class="nav-heading">Convocatorias</li>
+       <li class="nav-heading mt-4">Convocatorias</li>
 
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#convocatorias-submenu" data-bs-toggle="collapse" href="#">
@@ -50,7 +45,7 @@
               {% endif %}
             </ul>
           </li>
-          
+          <li class="nav-heading mt-4">Equipos</li>  
           <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#equipos-submenu" data-bs-toggle="collapse" href="#">
               <i class="bi bi-people-fill"></i>
@@ -76,7 +71,7 @@
 
 
 
-        <li class="nav-heading">Varios</li>
+        <li class="nav-heading mt-4">Varios</li>
         <li class="nav-item"><a class="nav-link collapsed" href="{% url 'faq' %}"><i class="bi bi-question-circle"></i><span>F.A.Q</span></a></li>
         <li class="nav-item"><a class="nav-link collapsed" href="{% url 'contacto' %}"><i class="bi bi-envelope"></i><span>Contacto</span></a></li>
         <li class="nav-item"><a class="nav-link collapsed" href="/logout"><i class="bi bi-box-arrow-in-right"></i><span>Salir</span></a></li>

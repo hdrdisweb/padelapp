@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="section faq">
+    <div class="container">
+        <h2 class="mb-4">Preguntas Frecuentes (FAQ's) - PadelAPP</h2>
+
+        <h4>Usuarios y Perfiles</h4>
+        <p><strong>¿Qué tipos de usuarios existen en la plataforma?</strong><br>
+        Existen dos tipos:<br>
+        - <strong>Administrador</strong>: tiene acceso total, puede gestionar todo el sistema.<br>
+        - <strong>Jugador</strong>: puede crear y apuntarse a partidos, modificar su perfil y recibir notificaciones.</p>
+
+        <p><strong>¿Cómo puedo editar mis datos personales?</strong><br>
+        Desde tu perfil, en la pestaña <em>"Editar perfil"</em>, puedes cambiar tu nombre, email, DNI, apodo, etc.</p>
+
+        <p><strong>¿Puedo cambiar mi contraseña?</strong><br>
+        Sí. Desde tu perfil, accedé a la pestaña <em>"Cambiar la contraseña"</em>.</p>
+
+        <p><strong>¿Puedo elegir si quiero recibir notificaciones?</strong><br>
+        Sí. En la pestaña <em>"Ajustes"</em> podés activar o desactivar notificaciones de:<br>
+        - Cambios en tu cuenta.<br>
+        - Partidos nuevos.<br>
+        - Pulls.<br>
+        - LAPA.<br>
+        - SNP.</p>
+
+        <hr>
+
+        <h4>Partidos</h4>
+        <p><strong>¿Quién puede crear un partido?</strong><br>
+        Cualquier jugador registrado puede crear un partido.</p>
+
+        <p><strong>¿Qué datos se necesitan para crear un partido?</strong><br>
+        Solo tenés que indicar:<br>
+        - Fecha<br>
+        - Hora<br>
+        - Lugar</p>
+
+        <p><strong>¿Me apunto automáticamente al crear un partido?</strong><br>
+        Sí, el creador queda automáticamente apuntado.</p>
+
+        <p><strong>¿Cómo me apunto a un partido?</strong><br>
+        Desde la vista del partido, hacé clic en el botón <em>“Apuntarme”</em>.</p>
+
+        <p><strong>¿Cuántos jugadores puede tener un partido?</strong><br>
+        Hasta 4 jugadores. Al llegar a 4, el partido se cierra automáticamente.</p>
+
+        <p><strong>¿Qué pasa si un jugador se baja de un partido?</strong><br>
+        El partido se vuelve a abrir para permitir que otro jugador se una.</p>
+
+        <p><strong>¿Puedo desapuntarme si ya no puedo jugar?</strong><br>
+        Sí. Hacés clic en <em>"Quitarme"</em> desde el detalle del partido.</p>
+
+        <hr>
+
+        <h4>Pulls</h4>
+        <p><strong>¿Qué es una Pull?</strong><br>
+        Una <em>Pull</em> es un grupo de jugadores organizado por nivel, evento o reglas específicas.</p>
+
+        <p><strong>¿Quién puede participar en una Pull?</strong><br>
+        Dependerá de las reglas de cada Pull. En general, estarán disponibles para jugadores seleccionados o por invitación.</p>
+
+        <p><strong>¿Cómo me entero si hay una Pull nueva?</strong><br>
+        Podés activar las notificaciones de Pulls en tu perfil, en la sección de <em>Ajustes</em>.</p>
+
+        <p><strong>¿Cómo me entero si hay una Pull nueva?</strong><br>
+            Podés activar las notificaciones de Pulls en tu perfil, en la sección de <em>Ajustes</em>.</p>
+    
+            <hr>
+    
+            <h4>Convocatorias</h4>
+            <p><strong>¿Cómo confirmo mi asistencia a una convocatoria?</strong><br>
+            Cuando sos convocado a un encuentro, podés confirmar tu asistencia desde el detalle de la convocatoria.</p>
+    
+            <p><strong>¿Quién puede responder?</strong><br>
+            Solo el <strong>jugador logueado</strong> que fue convocado podrá confirmar su asistencia. Nadie más (ni siquiera el administrador) puede responder por vos.</p>
+    
+            <p><strong>¿Qué opciones tengo?</strong><br>
+            Vas a ver dos botones:<br>
+            - <strong>Puedo</strong>: si vas a asistir.<br>
+            - <strong>No puedo</strong>: si no podés ir.</p>
+    
+            <p><strong>¿Dónde veo las respuestas?</strong><br>
+            En el detalle de la convocatoria, vas a ver un resumen visual con íconos y contadores que indican:<br>
+            - Jugadores que pueden ✅<br>
+            - Jugadores que no pueden ❌<br>
+            - Jugadores que aún no respondieron ❓</p>
+    
+            <p><strong>¿Cómo se comparte una convocatoria?</strong><br>
+            Si sos administrador, vas a ver un botón para <strong>compartir por WhatsApp</strong>, que genera un mensaje automático con el resumen y el enlace directo.</p>
+    
+    </div>
+</section>
+{% endblock %}
