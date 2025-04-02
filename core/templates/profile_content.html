@@ -6,21 +6,29 @@
     <div class="row"> 
         <div class="col-xl-4"> 
             <div class="card">
-                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                    <!-- Comprobamos si el usuario tiene avatar -->
-                    {% if user.avatar and user.avatar.url %}
-    <img src="{{ user.avatar.url }}" 
-         onerror="this.onerror=null;this.src='/static/img/default-avatar.jpg';" 
-         alt="Profile" class="rounded-circle">
-{% else %}
-    <img src="{% static 'img/default-avatar.jpg' %}" 
-         alt="Profile" class="rounded-circle">
-{% endif %}
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center" style="min-height: 250px;">
+                    <div class="d-flex justify-content-center">
+    {% if user.avatar and user.avatar.url %}
+        <img src="{{ user.avatar.url }}"
+             onerror="this.onerror=null;this.src='/static/img/default-avatar.jpg';"
+             alt="Perfil"
+             class="rounded-circle border shadow-sm"
+             style="width: 180px; height: 180px; object-fit: cover;">
+    {% else %}
+        <img src="{% static 'img/default-avatar.jpg' %}"
+             alt="Perfil"
+             class="rounded-circle border shadow-sm"
+             style="width: 180px; height: 180px; object-fit: cover;">
+    {% endif %}
+</div>
 
+                    
+            
                     <h2>{{ user.first_name }} {{ user.last_name }}</h2>
                     <h3>{{ user.username }}</h3>
                 </div>
             </div>
+            
         </div>         
         <div class="col-xl-8"> 
             <div class="card"> 
@@ -138,20 +146,19 @@
                                 <div class="row mb-3">
                                     <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Imagen de perfil</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <!-- Verifica si el usuario tiene avatar -->
                                         {% if user.avatar %}
-                                            <img src="{{ user.avatar.url }}" alt="Profile" class="rounded-circle">
+                                            <img src="{{ user.avatar.url }}" alt="Profile" class="rounded-circle" width="100">
                                         {% else %}
-                                            <img src="{% static 'img/default-avatar.jpg' %}" alt="Profile" class="rounded-circle">
+                                            <img src="{% static 'img/default-avatar.jpg' %}" alt="Profile" class="rounded-circle" width="100">
                                         {% endif %}
-                                        
+                                
                                         <div class="pt-2">
-                                            <input type="file" name="avatar" class="btn btn-primary btn-sm">
+                                            <input type="file" name="avatar" class="btn btn-primary btn-sm" accept="image/*">
                                             <a href="#" class="btn btn-danger btn-sm" title="Borrar imagen de perfil"><i class="bi bi-trash"></i></a>
                                         </div>
                                     </div>
                                 </div>
-                        
+                             
                                 <hr style="margin-top: 20px; margin-bottom: 20px;">
                                 <h5 class="section-title mt-4 mb-3">Datos Personales</h5>
                         
@@ -252,7 +259,7 @@
                         <!-- TAB 3 y 4 siguen intactos -->
                     </div>
 
-                    <div class="tab-pane fade pt-3" id="profile-settings"> 
+                    <div class="tab-pane fade" id="profile-settings"> 
                         <!-- Settings Form -->                             
                         <form> 
                             <div class="row mb-3"> 
@@ -296,31 +303,60 @@
                         </form>
                         <!-- End settings Form -->                             
                     </div>                         
-                    <div class="tab-pane fade pt-3" id="profile-change-password"> 
-                        <!-- Change Password Form -->                             
-                        <form> 
-                            <div class="row mb-3"> 
-                                <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Contraseña actual</label>                                     
-                                <div class="col-md-8 col-lg-9"> 
-                                    <input name="password" type="password" class="form-control" id="currentPassword"> 
-                                </div>                                     
-                            </div>                                 
-                            <div class="row mb-3"> 
-                                <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Nueva contraseña</label>                                     
-                                <div class="col-md-8 col-lg-9"> 
-                                    <input name="newpassword" type="password" class="form-control" id="newPassword"> 
-                                </div>                                     
-                            </div>                                 
-                            <div class="row mb-3"> 
-                                <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Repita nueva contraseña</label>                                     
-                                <div class="col-md-8 col-lg-9"> 
-                                    <input name="renewpassword" type="password" class="form-control" id="renewPassword"> 
-                                </div>                                     
-                            </div>                                 
-                            <div class="text-center"> 
-                                <button type="submit" class="btn btn-primary">Guardar contraseña</button>                                     
-                            </div>                                 
-                        </form>
+                    <div class="tab-pane fade" id="profile-change-password"> 
+                        <!-- Change Password Form --> 
+                         <!-- bloque de contraseña -->                             
+                        <form method="post" action="{% url 'cambiar_contrasena' %}">
+                            {% csrf_token %}
+                          
+                            <!-- Contraseña actual -->
+                            <div class="row mb-3">
+                                <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Contraseña actual</label>
+                                <div class="col-md-8 col-lg-9">
+                                  <div class="input-group">
+                                    <input name="actual" type="password" class="form-control" id="currentPassword" required>
+                                    <span class="input-group-text">
+                                      <i class="bi bi-eye-slash toggle-password" data-target="currentPassword" style="cursor:pointer;"></i>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                          
+                            <!-- Nueva contraseña -->
+                            <div class="row mb-3">
+                                <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Nueva contraseña</label>
+                                <div class="col-md-8 col-lg-9">
+                                  <div class="input-group">
+                                    <input name="nueva" type="password" class="form-control" id="newPassword" required>
+                                    <span class="input-group-text">
+                                      <i class="bi bi-eye-slash toggle-password" data-target="newPassword" style="cursor:pointer;"></i>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                          
+                            <!-- Repetir nueva contraseña -->
+                            <div class="row mb-3">
+                                <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Repita nueva contraseña</label>
+                                <div class="col-md-8 col-lg-9">
+                                  <div class="input-group">
+                                    <input name="nueva2" type="password" class="form-control" id="renewPassword" required>
+                                    <span class="input-group-text">
+                                      <i class="bi bi-eye-slash toggle-password" data-target="renewPassword" style="cursor:pointer;"></i>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                          
+                            <div class="text-center">
+                              <button type="submit" class="btn btn-primary">Guardar contraseña</button>
+                            </div>
+                          </form>
+                          
+                          
                         <!-- End Change Password Form -->                             
                     </div>                 
                     <!-- End Bordered Tabs -->                     
@@ -330,5 +366,23 @@
     </div>     
 </section>
 
-
+<script>
+    document.querySelectorAll('.toggle-password').forEach(icon => {
+      icon.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (input.type === 'password') {
+          input.type = 'text';
+          this.classList.remove('bi-eye-slash');
+          this.classList.add('bi-eye');
+        } else {
+          input.type = 'password';
+          this.classList.remove('bi-eye');
+          this.classList.add('bi-eye-slash');
+        }
+      });
+    });
+  </script>
+  
+  
 {% endblock %}

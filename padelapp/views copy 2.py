@@ -430,12 +430,6 @@ def lista_notificaciones(request):
     return render(request, 'padelapp/notificaciones.html', {'notifications': notifications})
 
 # gestionar las alineaciones de pull
-def obtener_mensaje_whatsapp_pull(alineacion):
-    pull = alineacion.pull
-    url = f"http://padelapp.xn--hdrdiseoweb-7db.es{reverse('gestionar_alineacion', args=[pull.id])}"
-    return f"""📋 *Alineación de la Pull \"{pull.nombre}\"*
-📅 {pull.fecha} ⏰ {pull.hora}
-👉 Mirala acá: {url}"""
 
 
 User = get_user_model()
@@ -531,13 +525,7 @@ def lista_equipos(request):
 def detalle_equipo(request, id):
     equipo = get_object_or_404(Team, id=id)
     jugadores = User.objects.filter(equipo=equipo)
-    jugadores_disponibles = User.objects.filter(equipo__isnull=True)
-    return render(request, 'padelapp/detalle_equipo.html', {
-        'equipo': equipo,
-        'jugadores': jugadores,
-        'jugadores_disponibles': jugadores_disponibles,
-    })
-
+    return render(request, 'padelapp/detalle_equipo.html', {'equipo': equipo, 'jugadores': jugadores})
 
 # CRUD equipo
 
@@ -736,14 +724,6 @@ def eliminar_convocatoria(request, convocatoria_id):
 
 #gestionar alinaciones de lapa y snp
 
-def obtener_mensaje_whatsapp_convocatoria(convocatoria):
-    url = f"http://padelapp.xn--hdrdiseoweb-7db.es{reverse('gestionar_alineacion_lapa' if convocatoria.equipo.tipo.startswith('LAPA') else 'gestionar_alineacion_snp', args=[convocatoria.id])}"
-
-    return f"""📋 *Alineación de {convocatoria.equipo.nombre} ({convocatoria.equipo.tipo})*
-📅 {convocatoria.fecha.strftime('%d/%m/%Y')} ⏰ {convocatoria.hora.strftime('%H:%M')}
-📍 {convocatoria.lugar}
-👉 Mirala acá: {url}"""
-
 @user_passes_test(es_admin)
 def gestionar_alineacion_lapa(request, convocatoria_id):
     convocatoria = get_object_or_404(Convocatoria, pk=convocatoria_id)
@@ -800,8 +780,6 @@ def gestionar_alineacion_lapa(request, convocatoria_id):
     jugadores_disponibles = jugadores.exclude(id__in=usados_ids)
 
     volver_url = reverse('detalle_convocatoria', args=[convocatoria.id])
-    mensaje_whatsapp = obtener_mensaje_whatsapp_convocatoria(convocatoria)
-
     return render(request, 'padelapp/gestionar_alineacion.html', {
         'convocatoria': convocatoria,
         'jugadores_disponibles': jugadores_disponibles,
@@ -811,7 +789,7 @@ def gestionar_alineacion_lapa(request, convocatoria_id):
         'num_pistas': "123",
         'volver_url': volver_url,
         'es_pull': False,
-        'mensaje_whatsapp': mensaje_whatsapp,
+
     })
 
 
@@ -877,7 +855,7 @@ def gestionar_alineacion_snp(request, convocatoria_id):
     jugadores_disponibles = jugadores.exclude(id__in=usados_ids)
 
     volver_url = reverse('detalle_convocatoria', args=[convocatoria.id])
-    mensaje_whatsapp = obtener_mensaje_whatsapp_convocatoria(convocatoria)
+
     return render(request, 'padelapp/gestionar_alineacion.html', {
         'convocatoria': convocatoria,
         'jugadores_disponibles': jugadores_disponibles,
@@ -887,7 +865,6 @@ def gestionar_alineacion_snp(request, convocatoria_id):
         'num_pistas': "12345",  # SNP usa 5 pistas
         'volver_url': volver_url,
         'es_pull': False,
-        'mensaje_whatsapp': mensaje_whatsapp,
 
     })
 
@@ -900,32 +877,3 @@ def dashboard(request):
     }
     return render(request, "content.html", context)
 
-
-# vista agregar y quitar jugadores a los equipos
-
-@user_passes_test(es_admin)
-def agregar_jugadores_a_equipo(request, id):
-    equipo = get_object_or_404(Team, id=id)
-
-    if request.method == 'POST':
-        jugadores_ids = request.POST.getlist('jugadores')
-        jugadores = User.objects.filter(id__in=jugadores_ids, equipo__isnull=True)
-        for jugador in jugadores:
-            jugador.equipo = equipo
-            jugador.save()
-        messages.success(request, 'Jugadores agregados correctamente.')
-        return redirect('detalle_equipo', id=equipo.id)
-    
-    return redirect('detalle_equipo', id=equipo.id)
-
-@user_passes_test(es_admin)
-def quitar_jugadores_de_equipo(request, id):
-    equipo = get_object_or_404(Team, id=id)
-
-    if request.method == 'POST':
-        jugadores_ids = request.POST.getlist('jugadores')
-        User.objects.filter(id__in=jugadores_ids, equipo=equipo).update(equipo=None)
-        messages.success(request, 'Jugadores quitados correctamente.')
-        return redirect('detalle_equipo', id=equipo.id)
-
-    return redirect('detalle_equipo', id=equipo.id)

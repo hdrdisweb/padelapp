@@ -9,58 +9,75 @@
             ({{ pull.fecha|date:"d/m/Y" }})
         {% endif %}
     </h2>
-    
 
     <form method="post" id="alineacionForm">
         {% csrf_token %}
-    
+
         <div class="row">
             {% for pista in num_pistas|make_list %}
-                <div class="col-12 col-md-4 mb-4 d-flex">
+                <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex">
                     <div class="card border-primary shadow-sm w-100 h-100">
                         <div class="card-header bg-primary text-white">
                             <strong>Pista {{ pista }}</strong>
                         </div>
                         <div class="card-body pista-dropzone text-center d-flex flex-column justify-content-center" data-pista="{{ pista }}">
                             {% if parejas_en_pista %}
-                                {% for item in parejas_en_pista %}
-                                    {% if item.pista|stringformat:"i" == pista %}
-                                        {% if forloop.counter0|divisibleby:2 %}
-                                            <div class="mb-4 p-3 bg-light border rounded shadow-sm">
-                                                <div class="d-flex justify-content-center gap-2 mb-1">
-                                                    <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.jugador_1.id }}">
-                                                        {{ item.jugador_1.apodo|default:item.jugador_1.username }}
-                                                    </div>
-                                                    <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.jugador_2.id }}">
-                                                        {{ item.jugador_2.apodo|default:item.jugador_2.username }}
-                                                    </div>
-                                                </div>
-                                        {% else %}
-                                        {% if es_pull %}
-                                        <div class="mb-2 fw-bold">VS</div>
-                                    {% endif %}
-                                    
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.jugador_1.id }}">
-                                                        {{ item.jugador_1.apodo|default:item.jugador_1.username }}
-                                                    </div>
-                                                    <div class="player-box border p-2 rounded bg-white" draggable="true" data-user-id="{{ item.jugador_2.id }}">
-                                                        {{ item.jugador_2.apodo|default:item.jugador_2.username }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
+    {% for item in parejas_en_pista %}
+        {% if item.pista|stringformat:"i" == pista %}
+            {% if forloop.counter0|divisibleby:2 %}
+                <div class="mb-4 p-3 bg-light border rounded shadow-sm">
+                    <div class="d-flex justify-content-center gap-2 mb-1 flex-wrap">
+                        <div class="player-box border p-2 rounded bg-white" draggable="true"
+                             data-user-id="{% if es_pull %}{{ item.pareja.jugador_1.id }}{% else %}{{ item.jugador_1.id }}{% endif %}">
+                            {% if es_pull %}
+                                {{ item.pareja.jugador_1.apodo|default:item.pareja.jugador_1.username }}
+                            {% else %}
+                                {{ item.jugador_1.apodo|default:item.jugador_1.username }}
                             {% endif %}
                         </div>
-                        
+                        <div class="player-box border p-2 rounded bg-white" draggable="true"
+                             data-user-id="{% if es_pull %}{{ item.pareja.jugador_2.id }}{% else %}{{ item.jugador_2.id }}{% endif %}">
+                            {% if es_pull %}
+                                {{ item.pareja.jugador_2.apodo|default:item.pareja.jugador_2.username }}
+                            {% else %}
+                                {{ item.jugador_2.apodo|default:item.jugador_2.username }}
+                            {% endif %}
+                        </div>
+                    </div>
+            {% else %}
+                {% if es_pull %}
+                    <div class="mb-2 fw-bold">VS</div>
+                {% endif %}
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <div class="player-box border p-2 rounded bg-white" draggable="true"
+                             data-user-id="{% if es_pull %}{{ item.pareja.jugador_1.id }}{% else %}{{ item.jugador_1.id }}{% endif %}">
+                            {% if es_pull %}
+                                {{ item.pareja.jugador_1.apodo|default:item.pareja.jugador_1.username }}
+                            {% else %}
+                                {{ item.jugador_1.apodo|default:item.jugador_1.username }}
+                            {% endif %}
+                        </div>
+                        <div class="player-box border p-2 rounded bg-white" draggable="true"
+                             data-user-id="{% if es_pull %}{{ item.pareja.jugador_2.id }}{% else %}{{ item.jugador_2.id }}{% endif %}">
+                            {% if es_pull %}
+                                {{ item.pareja.jugador_2.apodo|default:item.pareja.jugador_2.username }}
+                            {% else %}
+                                {{ item.jugador_2.apodo|default:item.jugador_2.username }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+                        </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        
-    
+
         <!-- Jugadores disponibles -->
         <div class="card mt-4 border-warning">
             <div class="card-header bg-warning">
@@ -74,9 +91,9 @@
                 {% endfor %}
             </div>
         </div>
-    
+
         <input type="hidden" name="alineacion_data" id="alineacionData">
-    
+
         <div class="d-flex flex-wrap justify-content-between mt-4 gap-2">
             <a href="{{ volver_url }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
@@ -85,28 +102,28 @@
             <button type="submit" class="btn btn-danger">
                 <i class="bi bi-save"></i> Guardar Alineación
             </button>
-    
+
             {% if alineacion %}
                 <button onclick="window.print()" type="button" class="btn btn-outline-dark">
                     <i class="bi bi-printer"></i> Imprimir / PDF
                 </button>
-    
+
                 <a href="https://wa.me/?text={{ mensaje_whatsapp|urlencode }}" class="btn btn-success" target="_blank">
                     <i class="bi bi-whatsapp"></i> Compartir
                 </a>
             {% endif %}
         </div>
     </form>
-      
-
 </div>
 
-<!-- Estilos -->
 <style>
     .player-box {
-        width: 120px;
+        min-width: 100px;
+        max-width: 100%;
+        flex: 1 1 45%;
         text-align: center;
         cursor: grab;
+        word-wrap: break-word;
     }
 
     .pista-dropzone {
@@ -115,6 +132,18 @@
         padding: 10px;
         border: 2px dashed #007bff;
         border-radius: 5px;
+    }
+
+    .card-body .d-flex {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    @media (max-width: 576px) {
+        .player-box {
+            flex: 1 1 100%;
+        }
     }
 
     @media print {
@@ -134,10 +163,13 @@
     }
 </style>
 
-<!-- Scripts -->
 <script>
     let dragged = null;
+    let touchClone = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
 
+    // Soporte para mouse
     document.querySelectorAll('.player-box').forEach(el => {
         el.addEventListener('dragstart', e => {
             dragged = el;
@@ -153,6 +185,54 @@
         });
     });
 
+    // Soporte para touch
+    document.querySelectorAll('.player-box').forEach(el => {
+        el.addEventListener('touchstart', e => {
+            dragged = el;
+
+            const touch = e.touches[0];
+            const rect = el.getBoundingClientRect();
+
+            touchOffsetX = touch.clientX - rect.left;
+            touchOffsetY = touch.clientY - rect.top;
+
+            touchClone = el.cloneNode(true);
+            touchClone.style.position = 'absolute';
+            touchClone.style.zIndex = '1000';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.width = `${rect.width}px`;
+            touchClone.style.left = `${touch.clientX - touchOffsetX}px`;
+            touchClone.style.top = `${touch.clientY - touchOffsetY}px`;
+
+            document.body.appendChild(touchClone);
+        });
+
+        el.addEventListener('touchmove', e => {
+            if (!touchClone) return;
+            const touch = e.touches[0];
+            touchClone.style.left = `${touch.clientX - touchOffsetX}px`;
+            touchClone.style.top = `${touch.clientY - touchOffsetY}px`;
+        });
+
+        el.addEventListener('touchend', e => {
+            if (!touchClone) return;
+
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            let zone = dropTarget.closest('.pista-dropzone') || dropTarget.closest('#jugadoresContainer');
+
+            if (zone && dragged) {
+                zone.appendChild(dragged);
+            }
+
+            document.body.removeChild(touchClone);
+            touchClone = null;
+            dragged = null;
+        });
+    });
+
+    // Guardar alineación
     document.getElementById('alineacionForm').addEventListener('submit', e => {
         const data = [];
         document.querySelectorAll('.pista-dropzone').forEach((zone) => {
@@ -172,4 +252,5 @@
         });
     });
 </script>
+
 {% endblock %}

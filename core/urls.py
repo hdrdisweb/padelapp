@@ -9,6 +9,8 @@ from .views import faq_view
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+
 urlpatterns = [
     path("grappelli/", include("grappelli.urls")),
     path("admin/", admin.site.urls),
@@ -27,6 +29,8 @@ urlpatterns = [
     path('partidos/<int:partido_id>/gestionar/', gestionar_partido, name='gestionar_partido'),
     path('contacto/', contacto_view, name='contacto'),
     path('faq/', faq_view, name='faq'),
+    path("cambiar_contrasena/", views.cambiar_contrasena, name="cambiar_contrasena"),
+
 ]
 
 if settings.DEBUG:

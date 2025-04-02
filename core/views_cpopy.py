@@ -9,11 +9,7 @@ from django.http import HttpResponse
 from django.core.mail import EmailMessage
 from core.forms import ContactForm
 from django.conf import settings
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from datetime import datetime
-from padelapp.models import User 
-from django.contrib.auth import update_session_auth_hash
+
 
 
 def index(request):
@@ -74,8 +70,10 @@ def register(request):
 
     return render(request, 'registro.html')
 
+# vista del perfil
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
-    # vista del perfil
 def profile(request):
     user = request.user
 
@@ -89,26 +87,7 @@ def profile(request):
             user.movil = request.POST.get("movil", "").strip()
             user.provincia = request.POST.get("provincia", "").strip()
 
-            # Nuevos campos
-            user.sexo = request.POST.get("sexo", "").strip()
-            
-            fecha_nacimiento_str = request.POST.get("fecha_nacimiento", "").strip()
-            if fecha_nacimiento_str:
-                user.fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d').date()
-            else:
-                user.fecha_nacimiento = None
-
-            user.poblacion = request.POST.get("poblacion", "").strip()
-            user.codigo_postal = request.POST.get("codigo_postal", "").strip()
-            user.apodo = request.POST.get("apodo", "").strip()
-            user.marca_pala = request.POST.get("marca_pala", "").strip()
-            user.tipo_pala = request.POST.get("tipo_pala", "").strip()
-
-            # Guardar avatar si fue subido
-            if 'avatar' in request.FILES:
-                user.avatar = request.FILES['avatar']
-
-            # Validaciones básicas
+            # Controlamos errores básicos
             if not user.email:
                 messages.error(request, "El correo es obligatorio.")
             elif User.objects.exclude(id=user.id).filter(email=user.email).exists():
@@ -125,7 +104,9 @@ def profile(request):
 
     return render(request, "profile_content.html")
 
-    # vista para qeu no puedan los jugadores crear pull
+
+
+# vista para qeu no puedan los jugadores crear pull
 
 def crear_pull(request):
     if not request.user.is_staff:
@@ -171,27 +152,3 @@ def contacto_view(request):
 
 def faq_view(request):
     return render(request, 'faq.html', {})
-
-# cambiar contraseña
-
-@login_required
-def cambiar_contrasena(request):
-    if request.method == "POST":
-        actual = request.POST.get("actual")
-        nueva = request.POST.get("nueva")
-        nueva2 = request.POST.get("nueva2")
-
-        if not request.user.check_password(actual):
-            messages.error(request, "La contraseña actual no es correcta.")
-        elif nueva != nueva2:
-            messages.error(request, "Las contraseñas nuevas no coinciden.")
-        elif len(nueva) < 6:
-            messages.error(request, "La nueva contraseña debe tener al menos 6 caracteres.")
-        else:
-            request.user.set_password(nueva)
-            request.user.save()
-            update_session_auth_hash(request, request.user)  # Para mantener la sesión activa
-            messages.success(request, "Contraseña cambiada correctamente.")
-            return redirect("profile")
-    
-    return redirect("profile")

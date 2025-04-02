@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <!-- Título principal con margen superior -->
+            <h2 class="mt-5 mb-4">
+                <i class="bi bi-people-fill me-2"></i> Partidos Sueltos
+            </h2>
+
+            <!-- Botón de crear partido -->
+            <a href="{% url 'crear_partido' %}" class="btn btn-primary mb-4">
+                + Crear Nuevo Partido
+            </a>
+
+            <div class="row">
+                {% for partido in partidos %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Partido en {{ partido.lugar }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>📅 Fecha:</strong> {{ partido.fecha }}</p>
+                                <p><strong>⏰ Hora:</strong> {{ partido.hora }}</p>
+                                <p><strong>👤 Creador:</strong> {{ partido.creador.username }}</p>
+                                <p><strong>🎾 Jugadores ({{ partido.jugadores.count }}/4):</strong></p>
+                                <ul>
+                                    {% for jugador in partido.jugadores.all %}
+                                        <li>{{ jugador.username }}</li>
+                                    {% empty %}
+                                        <li>Aún no hay jugadores inscritos.</li>
+                                    {% endfor %}
+                                </ul>
+
+                                <p><strong>Estado:</strong> 
+                                    <span class="badge bg-{% if partido.estado == 'Cerrado' %}danger{% else %}info{% endif %}">
+                                        {{ partido.estado }}
+                                    </span>
+                                </p>
+
+                                {% if user in partido.jugadores.all %}
+                                    <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-warning btn-sm w-100">Salir del partido</a>
+                                {% elif partido.estado == 'Abierto' %}
+                                    <a href="{% url 'gestionar_partido' partido.id %}" class="btn btn-primary btn-sm w-100">Unirse al partido</a>
+                                {% endif %}
+
+                                <a href="https://wa.me/?text={{ partido.mensaje_whatsapp|urlencode }}" class="btn btn-success btn-sm w-100 mt-2" target="_blank">
+                                    <i class="bi bi-whatsapp"></i> Compartir
+                                </a>
+
+                                {% if request.user.is_staff or partido.creador == request.user %}
+                                    <a href="{% url 'eliminar_partido' partido.id %}" class="btn btn-danger btn-sm w-100 mt-2"
+                                       onclick="return confirm('¿Estás seguro de que querés eliminar este partido?');">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -531,13 +531,7 @@ def lista_equipos(request):
 def detalle_equipo(request, id):
     equipo = get_object_or_404(Team, id=id)
     jugadores = User.objects.filter(equipo=equipo)
-    jugadores_disponibles = User.objects.filter(equipo__isnull=True)
-    return render(request, 'padelapp/detalle_equipo.html', {
-        'equipo': equipo,
-        'jugadores': jugadores,
-        'jugadores_disponibles': jugadores_disponibles,
-    })
-
+    return render(request, 'padelapp/detalle_equipo.html', {'equipo': equipo, 'jugadores': jugadores})
 
 # CRUD equipo
 
@@ -900,32 +894,3 @@ def dashboard(request):
     }
     return render(request, "content.html", context)
 
-
-# vista agregar y quitar jugadores a los equipos
-
-@user_passes_test(es_admin)
-def agregar_jugadores_a_equipo(request, id):
-    equipo = get_object_or_404(Team, id=id)
-
-    if request.method == 'POST':
-        jugadores_ids = request.POST.getlist('jugadores')
-        jugadores = User.objects.filter(id__in=jugadores_ids, equipo__isnull=True)
-        for jugador in jugadores:
-            jugador.equipo = equipo
-            jugador.save()
-        messages.success(request, 'Jugadores agregados correctamente.')
-        return redirect('detalle_equipo', id=equipo.id)
-    
-    return redirect('detalle_equipo', id=equipo.id)
-
-@user_passes_test(es_admin)
-def quitar_jugadores_de_equipo(request, id):
-    equipo = get_object_or_404(Team, id=id)
-
-    if request.method == 'POST':
-        jugadores_ids = request.POST.getlist('jugadores')
-        User.objects.filter(id__in=jugadores_ids, equipo=equipo).update(equipo=None)
-        messages.success(request, 'Jugadores quitados correctamente.')
-        return redirect('detalle_equipo', id=equipo.id)
-
-    return redirect('detalle_equipo', id=equipo.id)

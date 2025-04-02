@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
   <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
       <h4 class="mb-0">Jugadores del equipo "{{ equipo.nombre }}"</h4>
       <a href="{% url 'lista_equipos' %}" class="btn btn-secondary btn-sm">
         <i class="bi bi-arrow-left"></i> Volver a la lista
@@ -23,6 +23,75 @@
         <p class="text-muted">Este equipo no tiene jugadores aún.</p>
       {% endif %}
     </div>
+
+    <!-- Botones -->
+    <div class="text-end mt-3 px-3 pb-3 d-grid gap-2">
+      <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAgregarJugadores">
+        <i class="bi bi-person-plus"></i> Agregar jugadores disponibles
+      </button>
+
+      <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalQuitarJugadores">
+        <i class="bi bi-person-dash"></i> Quitar jugadores del equipo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agregar Jugadores -->
+<div class="modal fade" id="modalAgregarJugadores" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <form method="post" action="{% url 'agregar_jugadores_a_equipo' equipo.id %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Agregar jugadores al equipo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="jugadores" class="form-label">Jugadores disponibles:</label>
+          <select name="jugadores" id="jugadores" class="form-select" multiple size="8">
+            {% for jugador in jugadores_disponibles %}
+              <option value="{{ jugador.id }}">
+                {{ jugador.apodo|default:jugador.username }} - {{ jugador.first_name }} {{ jugador.last_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Agregar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Quitar Jugadores -->
+<div class="modal fade" id="modalQuitarJugadores" tabindex="-1" aria-labelledby="modalQuitarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <form method="post" action="{% url 'quitar_jugadores_de_equipo' equipo.id %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalQuitarLabel">Quitar jugadores del equipo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label for="jugadoresQuitar" class="form-label">Jugadores actuales:</label>
+          <select name="jugadores" id="jugadoresQuitar" class="form-select" multiple size="8">
+            {% for jugador in jugadores %}
+              <option value="{{ jugador.id }}">
+                {{ jugador.apodo|default:jugador.username }} - {{ jugador.first_name }} {{ jugador.last_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger btn-sm">Quitar</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}

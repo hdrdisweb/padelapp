@@ -42,8 +42,6 @@ urlpatterns = [
     path('convocatorias/<int:convocatoria_id>/eliminar/', eliminar_convocatoria, name='eliminar_convocatoria'),
     path('convocatorias/<int:convocatoria_id>/alineacion/lapa/', views.gestionar_alineacion_lapa, name='gestionar_alineacion_lapa'),
     path('convocatorias/<int:convocatoria_id>/alineacion/snp/', views.gestionar_alineacion_snp, name='gestionar_alineacion_snp'),
-    path('equipos/<int:id>/agregar-jugadores/', views.agregar_jugadores_a_equipo, name='agregar_jugadores_a_equipo'),
-    path('equipos/<int:id>/quitar-jugadores/', views.quitar_jugadores_de_equipo, name='quitar_jugadores_de_equipo'),
 
     
 ]

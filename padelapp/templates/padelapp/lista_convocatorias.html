@@ -2,57 +2,63 @@
 
 {% block content %}
 <div class="container mt-4">
-  <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">Lista de Convocatorias</h4>
-      {% if request.user.is_staff %}
-        <a href="{% url 'crear_convocatoria' %}" class="btn btn-primary btn-sm">
-          <i class="bi bi-plus-circle"></i> Crear nueva convocatoria
-        </a>
-      {% endif %}
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Equipo</th>
-              <th>Fecha</th>
-              <th>Ubicación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for convocatoria in convocatorias %}
-            <tr>
-              <td>{{ convocatoria.id }}</td>
-              <td>{{ convocatoria.equipo.nombre }}</td>
-              <td>{{ convocatoria.fecha|date:"d/m/Y" }} {{ convocatoria.hora|time:"H:i" }}</td>
-              <td>{{ convocatoria.lugar }}</td>
-              <td>
-                <a href="{% url 'detalle_convocatoria' convocatoria.id %}" class="btn btn-info btn-sm">
-                  <i class="bi bi-eye"></i> Ver
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h2 class="mt-5 mb-4">
+                <i class="bi bi-calendar-check me-2"></i> Lista de Convocatorias
+            </h2>
+
+            {% if request.user.is_staff %}
+                <a href="{% url 'crear_convocatoria' %}" class="btn btn-primary mb-3">
+                    <i class="bi bi-plus-circle"></i> Crear nueva convocatoria
                 </a>
-                {% if request.user.is_staff %}
-                  <a href="{% url 'editar_convocatoria' convocatoria.id %}" class="btn btn-warning btn-sm">
-                    <i class="bi bi-pencil-square"></i> Editar
-                  </a>
-                  <a href="{% url 'eliminar_convocatoria' convocatoria.id %}" class="btn btn-danger btn-sm">
-                    <i class="bi bi-trash"></i> Eliminar
-                  </a>
-                {% endif %}
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="5" class="text-center">No hay convocatorias.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            {% endif %}
+
+            <div class="row">
+                {% for convocatoria in convocatorias %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-lg">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">{{ convocatoria.equipo.nombre }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mt-4 mb-3">
+                                    <i class="bi bi-calendar-event me-1 text-primary"></i>
+                                    <strong>Fecha:</strong> {{ convocatoria.fecha|date:"d/m/Y" }} {{ convocatoria.hora|time:"H:i" }}
+                                </p>
+                                <p class="mb-4">
+                                    <i class="bi bi-geo-alt-fill me-1 text-primary"></i>
+                                    <strong>Ubicación:</strong> {{ convocatoria.lugar }}
+                                </p>
+
+                                <div class="d-flex flex-column gap-2 mt-auto">
+                                    <a href="{% url 'detalle_convocatoria' convocatoria.id %}" class="btn btn-info btn-sm w-100">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    {% if request.user.is_staff %}
+                                        <a href="{% url 'editar_convocatoria' convocatoria.id %}" class="btn btn-warning btn-sm w-100">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                        <a href="{% url 'eliminar_convocatoria' convocatoria.id %}" class="btn btn-danger btn-sm w-100"
+                                           onclick="return confirm('¿Estás seguro de que querés eliminar esta convocatoria?');">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p>No hay convocatorias.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
     </div>
-  </div>
+
 </div>
 {% endblock %}
